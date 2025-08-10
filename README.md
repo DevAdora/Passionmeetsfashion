@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Passion Meets Fashion 🛍️
 
-## Getting Started
+An e-commerce web application built with **Next.js 14 (App Router)**, **Supabase**, and **Tailwind CSS**, featuring separate **Admin** and **User** portals.  
+This project supports product browsing, cart management, order tracking, and secure authentication for both customers and admins.
 
-First, run the development server:
+## 🚀 Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Frontend:** Next.js 14 (React + App Router)
+- **UI:** Tailwind CSS + shadcn/ui
+- **Auth & Database:** Supabase
+- **Deployment:** Vercel
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Customer Portal
+- Sign up and login
+- Browse products with sizes and variants
+- Add to cart and checkout
+- Track order status
+- Receive order confirmations
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Admin Portal
+- Secure admin authentication
+- Manage products (add, edit, delete)
+- Process and confirm customer orders
+- Track and update order statuses
 
-## Learn More
+### General
+- Role-based authentication (Admin / User)
+- Responsive, mobile-friendly design
+- Fast deployment with Vercel
 
-To learn more about Next.js, take a look at the following resources:
+## 📂 Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
