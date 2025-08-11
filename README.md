@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# Passionmeetsfashion
-=======
 # Passion Meets Fashion 🛍️
 
 An e-commerce web application built with **Next.js 14 (App Router)**, **Supabase**, and **Tailwind CSS**, featuring separate **Admin** and **User** portals.  
@@ -35,4 +32,3 @@ This project supports product browsing, cart management, order tracking, and sec
 
 ## 📂 Project Structure
 
->>>>>>> master
