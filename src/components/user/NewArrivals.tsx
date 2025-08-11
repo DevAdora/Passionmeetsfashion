@@ -19,7 +19,7 @@ export default function NewArrivals() {
 
       {/* Overlay Text */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <h2 className="text-white text-5xl md:text-7xl font-bold ">
+        <h2 className="text-white text-[8rem] md:text-[14rem] font-bold uppercase text-center">
           New Arrivals
         </h2>
       </div>
