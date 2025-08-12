@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import addToCart from "@/app/api/addToCart";
 
 interface ProductCardProps {
   id: string;
@@ -76,7 +77,9 @@ export default function ProductCard({
               className="w-full h-60 object-contain rounded-lg mb-4"
             />
             <p className="text-black mb-2">{description}</p>
-            <p className="text-black font-semibold mb-4">₱{price.toLocaleString()}</p>
+            <p className="text-black font-semibold mb-4">
+              ₱{price.toLocaleString()}
+            </p>
 
             {/* Color selection */}
             <div className="mb-4">
@@ -116,16 +119,24 @@ export default function ProductCard({
             </div>
 
             {/* Action Button */}
+            {/* Action Button */}
             <button
-              onClick={() => {
-                setModalOpen(false);
+              onClick={async () => {
                 if (actionType === "cart") {
-                  console.log("Added to cart", {
-                    id,
-                    name,
-                    selectedColor,
-                    selectedSize,
-                  });
+                  try {
+                    await addToCart({
+                      id,
+                      name,
+                      image,
+                      price,
+                      quantity: 1,
+                      size: selectedSize,
+                      color: selectedColor,
+                    });
+                    console.log(`${name} added to cart successfully!`);
+                  } catch (err) {
+                    console.error("Failed to add to cart:", err);
+                  }
                 } else {
                   console.log("Buying now", {
                     id,
@@ -134,6 +145,7 @@ export default function ProductCard({
                     selectedSize,
                   });
                 }
+                setModalOpen(false);
               }}
               className="w-full py-2 bg-black text-white rounded hover:bg-gray-800"
             >
