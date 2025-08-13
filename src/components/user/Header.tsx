@@ -117,7 +117,7 @@ export default function Header() {
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
               {cartCount}
             </span>
-          )}
+          )}      
           <span
             className={`w-10 h-0.5 transition-all duration-500 ease-in-out ${
               isMobileMenuOpen
