@@ -18,6 +18,7 @@ import {
   ShoppingCart,
   BarChart,
   Menu,
+  LogOut,
 } from "lucide-react";
 
 const navItems = [
@@ -25,6 +26,7 @@ const navItems = [
   { name: "Orders", path: "/admin/orders", icon: ShoppingCart },
   { name: "Inventory", path: "/admin/inventory", icon: Package },
   { name: "Sales", path: "/admin/sales", icon: BarChart },
+  { name: "Logout", path: "/auth/login", icon:  LogOut},
 ];
 
 export default function AdminSidebar() {
