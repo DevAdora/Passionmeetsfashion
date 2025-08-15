@@ -10,7 +10,7 @@ interface ProductCardProps {
   price: number;
   description: string;
   colors: string[];
-  sizes: string[];
+  sizes: { label: string; stock: number }[]; // ✅ match DB
 }
 
 export default function ProductCard({
@@ -22,10 +22,10 @@ export default function ProductCard({
   colors,
   sizes,
 }: ProductCardProps) {
+  const [selectedColor, setSelectedColor] = useState(colors[0]);
+  const [selectedSize, setSelectedSize] = useState(sizes[0]?.label || "");
   const [modalOpen, setModalOpen] = useState(false);
   const [actionType, setActionType] = useState<"cart" | "buy">("cart");
-  const [selectedColor, setSelectedColor] = useState(colors[0]);
-  const [selectedSize, setSelectedSize] = useState(sizes[0]);
 
   const handleActionClick = (type: "cart" | "buy") => {
     setActionType(type);
@@ -104,15 +104,16 @@ export default function ProductCard({
               <div className="flex gap-2">
                 {sizes.map((size) => (
                   <button
-                    key={size}
+                    key={size.label}
                     className={`px-3 py-1 border rounded ${
-                      selectedSize === size
+                      selectedSize === size.label
                         ? "bg-black text-white"
                         : "bg-white text-black"
                     }`}
-                    onClick={() => setSelectedSize(size)}
+                    onClick={() => setSelectedSize(size.label)}
+                    disabled={size.stock <= 0} // optionally disable out-of-stock
                   >
-                    {size}
+                    {size.label} ({size.stock})
                   </button>
                 ))}
               </div>

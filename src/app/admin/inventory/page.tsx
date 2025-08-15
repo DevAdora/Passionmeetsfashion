@@ -22,7 +22,11 @@ export default function AdminInventoryPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [colors, setColors] = useState<string[]>([]);
-  const [sizes, setSizes] = useState<string[]>(["Small", "Medium", "Large"]);
+  const [sizes, setSizes] = useState([
+    { label: "Small", stock: 0 },
+    { label: "Medium", stock: 0 },
+    { label: "Large", stock: 0 },
+  ]);
   const [price, setPrice] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -89,7 +93,11 @@ export default function AdminInventoryPage() {
       setName("");
       setDescription("");
       setColors([]);
-      setSizes(["Small", "Medium", "Large"]);
+      setSizes([
+        { label: "Small", stock: 0 },
+        { label: "Medium", stock: 0 },
+        { label: "Large", stock: 0 },
+      ]);
       setPrice("");
       setImageFile(null);
 
@@ -137,13 +145,32 @@ export default function AdminInventoryPage() {
                   setColors(e.target.value.split(",").map((c) => c.trim()))
                 }
               />
-              <Input
-                placeholder="Sizes (comma separated)"
-                value={sizes.join(", ")}
-                onChange={(e) =>
-                  setSizes(e.target.value.split(",").map((s) => s.trim()))
-                }
-              />
+              <div className="space-y-2">
+                {sizes.map((size, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      value={size.label}
+                      onChange={(e) => {
+                        const updated = [...sizes];
+                        updated[index].label = e.target.value;
+                        setSizes(updated);
+                      }}
+                      placeholder="Size label"
+                    />
+                    <Input
+                      type="number"
+                      value={size.stock}
+                      onChange={(e) => {
+                        const updated = [...sizes];
+                        updated[index].stock = parseInt(e.target.value) || 0;
+                        setSizes(updated);
+                      }}
+                      placeholder="Stock"
+                    />
+                  </div>
+                ))}
+              </div>
+
               {/* Image Upload */}
               <Input
                 type="file"
@@ -196,8 +223,10 @@ export default function AdminInventoryPage() {
               </div>
 
               <div className="mt-2 gap-2">
-                {product.sizes?.map((size: string, idx: number) => (
-                  <Badge key={idx}>{size}</Badge>
+                {product.sizes?.map((sizeObj: any, idx: number) => (
+                  <Badge key={idx}>
+                    {sizeObj.label} ({sizeObj.stock})
+                  </Badge>
                 ))}
               </div>
               <p className="mt-2 font-bold">${product.price}</p>
