@@ -82,6 +82,12 @@ export default function LoginForm() {
       <Button type="submit" disabled={loading} className="w-full">
         {loading ? "Logging in..." : "Log In"}
       </Button>
+
+      <div>
+        <a href="/auth/register" className="text-blue-600 hover:underline">
+          Sign up
+        </a>
+      </div>
     </form>
   );
 }
