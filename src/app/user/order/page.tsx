@@ -3,16 +3,36 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-export default function AdminOrderPage() {
+export default function CustomerOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchOrders();
+    fetchCustomerOrders();
   }, []);
 
-  async function fetchOrders() {
+  async function fetchCustomerOrders() {
     setLoading(true);
+
+    // ✅ Get current user
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError) {
+      console.error("Error fetching user:", userError);
+      setLoading(false);
+      return;
+    }
+
+    if (!user) {
+      console.warn("No user logged in");
+      setLoading(false);
+      return;
+    }
+
+    // ✅ Fetch only this user's orders
     const { data, error } = await supabase
       .from("orders")
       .select(
@@ -34,52 +54,40 @@ export default function AdminOrderPage() {
         )
       `
       )
+      .eq("user_id", user.id) // ✅ filter by logged-in user
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error fetching orders:", error);
+      console.error("Error fetching customer orders:", error);
     } else {
       setOrders(data || []);
     }
+
     setLoading(false);
-  }
-
-  async function confirmOrder(orderId: string) {
-    const { error } = await supabase
-      .from("orders")
-      .update({ status: "shipped" })
-      .eq("id", orderId);
-
-    if (error) {
-      console.error("Error updating order:", error);
-    } else {
-      fetchOrders(); // refresh orders
-    }
   }
 
   return (
     <section className="p-6 bg-gray-50">
-      <h1 className="text-2xl font-bold mb-6">Orders</h1>
+      <h1 className="text-2xl font-bold mb-6">My Orders</h1>
 
-      {loading && <p>Loading orders...</p>}
+      {loading && <p>Loading your orders...</p>}
 
       <div className="grid grid-cols-1 gap-6">
         {orders.length === 0 ? (
-          <div className="text-gray-500">No orders found</div>
+          <div className="text-gray-500">You have no orders yet</div>
         ) : (
           orders.map((order) => (
             <div
               key={order.id}
-              className="bg-gray-450 p-6 rounded-xl shadow-md text-black"
+              className="bg-white p-6 rounded-xl shadow-md text-black"
             >
-              <div className="justify-between grid grid-cols-3 items-start gap-4">
-                {/* Left side: order details */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Order items */}
                 <div>
-                  <h1 className="font-semibold text-[1rem]">
+                  <h1 className="font-semibold text-[1rem] mb-2">
                     Order ID: {order.id}
                   </h1>
 
-                  {/* Order items */}
                   {order.order_items.map((item: any, idx: number) => (
                     <div key={idx} className="flex items-center gap-3 mt-2">
                       {item.products?.image_url && (
@@ -98,38 +106,19 @@ export default function AdminOrderPage() {
                     </div>
                   ))}
                 </div>
-                {/* Customer details */}
-                <div className="w-full">
-                  <p className="text-[1rem] mb-4">
-                    <strong>Customer:</strong> {order.full_name}
+
+                {/* Order details */}
+                <div>
+                  <p className="text-sm mb-2">
+                    <strong>Address:</strong> {order.street}, {order.city}
                   </p>
-                  <p className="text-[1rem] mb-4">
-                    <strong>Address:</strong> {order.street}, {order.city},{" "}
-                    {order.country}
-                  </p>
-                  <p className="text-[1rem] mb-4">
+                  <p className="text-sm mb-2">
                     <strong>Payment:</strong> {order.payment_method}
                   </p>
-                  <p className="text-[1rem]">
+                  <p className="text-sm">
                     <strong>Status:</strong>{" "}
                     <span className="capitalize">{order.status}</span>
                   </p>
-                </div>
-
-                {/* Right side: payment + action */}
-                <div className="flex flex-col items-end h-full justify-end ">
-                  {order.status === "pending" ? (
-                    <button
-                      onClick={() => confirmOrder(order.id)}
-                      className="bg-black text-white px-4 py-2 rounded-lg shadow-md  transition cursor-pointer"
-                    >
-                      Confirm & Ship
-                    </button>
-                  ) : (
-                    <span className="px-3 py-1 bg-green-200 text-green-800 rounded-lg">
-                      {order.status}
-                    </span>
-                  )}
                 </div>
               </div>
             </div>

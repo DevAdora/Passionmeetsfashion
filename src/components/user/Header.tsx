@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 
 const navItems = [
   { name: "Home", path: "/user/dashboard" },
-  { name: "Orders", path: "/user/orders" },
+  { name: "Orders", path: "/user/order" },
   { name: "Profile", path: "/user/profile" },
   { name: "Cart", path: "/cart" }, // ✅ Add this
 

@@ -77,15 +77,68 @@ export default function CheckoutPage() {
       alert("Invalid voucher code");
     }
   }
+  async function handlePlaceOrder() {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        alert("You must be logged in to place an order");
+        return;
+      }
 
-  function handlePlaceOrder() {
-    console.log("Placing order with:", {
-      items,
-      address,
-      paymentMethod,
-      total: finalPrice,
-    });
-    alert("Order placed successfully!");
+      // Insert into orders table
+      const { data: orderData, error: orderError } = await supabase
+        .from("orders")
+        .insert([
+          {
+            user_id: user.id,
+            full_name: address.fullName,
+            phone: address.phone,
+            street: address.street,
+            city: address.city,
+            postal: address.postal,
+            payment_method: paymentMethod,
+            total_price: finalPrice,
+            status: "pending",
+          },
+        ])
+        .select();
+
+      if (orderError || !orderData || orderData.length === 0) {
+        console.error("Order insert error:", orderError);
+        alert("Failed to place order");
+        return;
+      }
+
+      const order = orderData[0]; // ✅ The new order row
+
+      // Prepare order_items
+      const orderItems = items.map((item: any) => ({
+        order_id: order.id,
+        product_id: Number(item.product_id), // ✅ use product_id
+        product_name: item.product_name,
+        price: item.price,
+        quantity: item.quantity,
+      }));
+
+      console.log("Inserting order items:", orderItems); // ✅ after declaration
+
+      const { error: itemsError } = await supabase
+        .from("order_items")
+        .insert(orderItems);
+
+      if (itemsError) {
+        console.error("Order items insert error:", itemsError);
+        alert("Failed to save order items");
+        return;
+      }
+
+      alert("Order placed successfully!");
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      alert("Something went wrong");
+    }
   }
 
   return (

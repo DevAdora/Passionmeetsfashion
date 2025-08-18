@@ -9,6 +9,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 const data = [
   { name: "Jan", sales: 4000 },
@@ -20,21 +22,59 @@ const data = [
 ];
 
 export default function AdminDashboardPage() {
+  const [counts, setCounts] = useState({
+    pending: 0,
+    shipped: 0,
+    confirmed: 0,
+  });
+  useEffect(() => {
+    async function fetchOrderCounts() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // statuses to track
+      const statuses = ["pending", "shipped", "confirmed"];
+
+      const results = await Promise.all(
+        statuses.map(async (status) => {
+          const { count, error } = await supabase
+            .from("orders")
+            .select("*", { count: "exact", head: true })
+            .eq("status", status);
+
+          if (error) {
+            console.error(`Error fetching ${status} count:`, error);
+            return [status, 0];
+          }
+          return [status, count || 0];
+        })
+      );
+
+      // Convert array into object { pending: n, shipping: n, confirmed: n }
+      const countsObj = Object.fromEntries(results);
+      setCounts(countsObj as typeof counts);
+    }
+
+    fetchOrderCounts();
+  }, []);
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
         <div className="bg-gray-450 p-6 rounded-xl shadow-md text-black">
           <h1 className="font-bold text-[2rem]">Pending Orders</h1>
-          <h1 className="font-bold text-[2rem]">0</h1>
+          <h1 className="text-[2rem] font-bold">{counts.pending}</h1>
         </div>
         <div className="bg-gray-450 p-6 rounded-xl shadow-md text-black">
-          <h1 className="font-bold text-[2rem]">Shipping</h1>
-          <h1 className="font-bold text-[2rem]">0</h1>
+          <h1 className="font-bold text-[2rem]">Shipped</h1>
+          <h1 className="text-[2rem] font-bold">{counts.shipped}</h1>
         </div>
         <div className="bg-gray-450 p-6 rounded-xl shadow-md text-black">
           <h1 className="font-bold text-[2rem]">Confirmed Orders</h1>
-          <h1 className="font-bold text-[2rem]">0</h1>
+          <h1 className="text-[2rem] font-bold">{counts.confirmed}</h1>
         </div>
       </div>
 
