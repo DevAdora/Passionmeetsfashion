@@ -36,7 +36,6 @@ export default function CheckoutPage() {
   );
   const finalPrice = totalPrice - discount;
 
-  // ✅ Fetch logged-in user profile
   useEffect(() => {
     async function fetchUserProfile() {
       const {
@@ -87,7 +86,6 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Insert into orders table
       const { data: orderData, error: orderError } = await supabase
         .from("orders")
         .insert([
@@ -111,18 +109,17 @@ export default function CheckoutPage() {
         return;
       }
 
-      const order = orderData[0]; // ✅ The new order row
+      const order = orderData[0];
 
-      // Prepare order_items
       const orderItems = items.map((item: any) => ({
         order_id: order.id,
-        product_id: Number(item.product_id), // ✅ use product_id
+        product_id: Number(item.product_id),
         product_name: item.product_name,
         price: item.price,
         quantity: item.quantity,
+        size: item.size,
+        color: item.color,
       }));
-
-      console.log("Inserting order items:", orderItems); // ✅ after declaration
 
       const { error: itemsError } = await supabase
         .from("order_items")
@@ -132,6 +129,41 @@ export default function CheckoutPage() {
         console.error("Order items insert error:", itemsError);
         alert("Failed to save order items");
         return;
+      }
+
+      for (const item of items) {
+        const { data: product, error: fetchError } = await supabase
+          .from("products")
+          .select("sizes")
+          .eq("id", item.product_id)
+          .single();
+
+        if (fetchError || !product) {
+          console.error("Error fetching product sizes:", fetchError);
+          continue;
+        }
+
+        let sizes = product.sizes || [];
+        const updatedSizes = sizes.map((s: any) => {
+          if (s.label === item.size) {
+            if (s.stock < item.quantity) {
+              throw new Error(
+                `Not enough stock for ${item.product_name} - ${item.size}`
+              );
+            }
+            return { ...s, stock: s.stock - item.quantity };
+          }
+          return s;
+        });
+
+        const { error: updateError } = await supabase
+          .from("products")
+          .update({ sizes: updatedSizes })
+          .eq("id", item.product_id);
+
+        if (updateError) {
+          console.error("Error updating stock:", updateError);
+        }
       }
 
       alert("Order placed successfully!");
@@ -265,7 +297,7 @@ export default function CheckoutPage() {
             {items.map((item: any) => (
               <div
                 key={item.id}
-                className="flex justify-between items-center border-b pb-2"
+                className="flex justify-between items-start border-b pb-2"
               >
                 <div>
                   <p className="font-semibold text-black">
@@ -274,6 +306,18 @@ export default function CheckoutPage() {
                   <p className="text-sm text-gray-600">
                     {item.quantity} × ₱{item.price.toLocaleString()}
                   </p>
+                  {item.size && (
+                    <p className="text-sm text-gray-500">Size: {item.size}</p>
+                  )}
+                  {item.color && (
+                    <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <span>Color:</span>
+                      <span
+                        className="inline-block w-3 h-3 rounded-full border"
+                        style={{ backgroundColor: item.color }}
+                      ></span>
+                    </div>
+                  )}
                 </div>
                 <p className="font-bold text-black">
                   ₱{(item.quantity * item.price).toLocaleString()}

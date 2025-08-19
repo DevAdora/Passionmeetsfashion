@@ -12,57 +12,93 @@ import {
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
-const data = [
-  { name: "Jan", sales: 4000 },
-  { name: "Feb", sales: 3000 },
-  { name: "Mar", sales: 5000 },
-  { name: "Apr", sales: 4500 },
-  { name: "May", sales: 6000 },
-  { name: "Jun", sales: 7000 },
-];
-
 export default function AdminDashboardPage() {
   const [counts, setCounts] = useState({
     pending: 0,
     shipped: 0,
     confirmed: 0,
   });
+  const [stockData, setStockData] = useState<
+    { name: string; totalStock: number }[]
+  >([]);
+  const [orderCategories, setOrderCategories] = useState<
+    { product_name: string; count: number }[]
+  >([]);
+
   useEffect(() => {
-    async function fetchOrderCounts() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+    fetchOrderCounts();
+    fetchStockNumbers();
+    fetchOrderCategories();
+  }, []);
 
-      // statuses to track
-      const statuses = ["pending", "shipped", "confirmed"];
+  async function fetchOrderCounts() {
+    const statuses = ["pending", "shipped", "confirmed"];
 
-      const results = await Promise.all(
-        statuses.map(async (status) => {
-          const { count, error } = await supabase
-            .from("orders")
-            .select("*", { count: "exact", head: true })
-            .eq("status", status);
+    const results = await Promise.all(
+      statuses.map(async (status) => {
+        const { count, error } = await supabase
+          .from("orders")
+          .select("*", { count: "exact", head: true })
+          .eq("status", status);
 
-          if (error) {
-            console.error(`Error fetching ${status} count:`, error);
-            return [status, 0];
-          }
-          return [status, count || 0];
-        })
-      );
+        if (error) {
+          console.error(`Error fetching ${status} count:`, error);
+          return [status, 0];
+        }
+        return [status, count || 0];
+      })
+    );
 
-      // Convert array into object { pending: n, shipping: n, confirmed: n }
-      const countsObj = Object.fromEntries(results);
-      setCounts(countsObj as typeof counts);
+    setCounts(Object.fromEntries(results) as typeof counts);
+  }
+
+  async function fetchStockNumbers() {
+    const { data, error } = await supabase.from("products").select("*");
+    if (error) {
+      console.error("Error fetching products:", error);
+      return;
     }
 
-    fetchOrderCounts();
-  }, []);
+    // sum stock from sizes JSON array
+    const stockSummary = data.map((product) => {
+      const totalStock = (product.sizes || []).reduce(
+        (sum: number, s: any) => sum + (s.stock || 0),
+        0
+      );
+      return { name: product.name, totalStock };
+    });
+
+    setStockData(stockSummary);
+  }
+
+  async function fetchOrderCategories() {
+    const { data, error } = await supabase
+      .from("order_items")
+      .select("product_name");
+    if (error) {
+      console.error("Error fetching order items:", error);
+      return;
+    }
+
+    // count number of occurrences per product_name
+    const counts: Record<string, number> = {};
+    data.forEach((item) => {
+      counts[item.product_name] = (counts[item.product_name] || 0) + 1;
+    });
+
+    setOrderCategories(
+      Object.entries(counts).map(([product_name, count]) => ({
+        product_name,
+        count,
+      }))
+    );
+  }
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+
+      {/* Order status cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
         <div className="bg-gray-450 p-6 rounded-xl shadow-md text-black">
           <h1 className="font-bold text-[2rem]">Pending Orders</h1>
@@ -78,10 +114,20 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
+      {/* Monthly Sales (static for now) */}
       <div className="bg-white p-6 rounded-xl shadow-md my-6">
         <h2 className="text-lg font-semibold mb-4">Monthly Sales</h2>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data}>
+          <LineChart
+            data={[
+              { name: "Jan", sales: 4000 },
+              { name: "Feb", sales: 3000 },
+              { name: "Mar", sales: 5000 },
+              { name: "Apr", sales: 4500 },
+              { name: "May", sales: 6000 },
+              { name: "Jun", sales: 7000 },
+            ]}
+          >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis />
@@ -95,36 +141,35 @@ export default function AdminDashboardPage() {
           </LineChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Stock Numbers + Order Categories */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
         <div className="bg-gray-450 p-6 rounded-xl shadow-md text-black">
-          <h1 className="font-bold text-[2rem]">Stock numbers</h1>
-          <div className="justify-between flex items-center mt-4">
-            <h1 className="font-semibold text-[1rem]">White Tee</h1>
-            <h1 className="font-semibold text-[1rem]">20</h1>
-          </div>
-          <div className="justify-between flex items-center mt-4">
-            <h1 className="font-semibold text-[1rem]">Classic Hoodie</h1>
-            <h1 className="font-semibold text-[1rem]">11</h1>
-          </div>
-          <div className="justify-between flex items-center mt-4">
-            <h1 className="font-semibold text-[1rem]">Black Tee</h1>
-            <h1 className="font-semibold text-[1rem]">31</h1>
-          </div>
+          <h1 className="font-bold text-[2rem]">Stock Numbers</h1>
+          {stockData.map((prod) => (
+            <div
+              key={prod.name}
+              className="justify-between flex items-center mt-4"
+            >
+              <h1 className="font-semibold text-[1rem]">{prod.name}</h1>
+              <h1 className="font-semibold text-[1rem]">{prod.totalStock}</h1>
+            </div>
+          ))}
         </div>
+
         <div className="bg-gray-450 p-6 rounded-xl shadow-md text-black">
           <h1 className="font-bold text-[2rem]">Order Categories</h1>
-          <div className="justify-between flex items-center mt-4">
-            <h1 className="font-semibold text-[1rem]">White Tee</h1>
-            <h1 className="font-semibold text-[1rem]">20</h1>
-          </div>
-          <div className="justify-between flex items-center mt-4">
-            <h1 className="font-semibold text-[1rem]">Classic Hoodie</h1>
-            <h1 className="font-semibold text-[1rem]">11</h1>
-          </div>
-          <div className="justify-between flex items-center mt-4">
-            <h1 className="font-semibold text-[1rem]">Black Tee</h1>
-            <h1 className="font-semibold text-[1rem]">31</h1>
-          </div>{" "}
+          {orderCategories.map((cat) => (
+            <div
+              key={cat.product_name}
+              className="justify-between flex items-center mt-4"
+            >
+              <h1 className="font-semibold text-[1rem]">
+                {cat.product_name}
+              </h1>
+              <h1 className="font-semibold text-[1rem]">{cat.count}</h1>
+            </div>
+          ))}
         </div>
       </div>
     </div>
