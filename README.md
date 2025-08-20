@@ -29,6 +29,3 @@ This project supports product browsing, cart management, order tracking, and sec
 - Role-based authentication (Admin / User)
 - Responsive, mobile-friendly design
 - Fast deployment with Vercel
-
-## 📂 Project Structure
-
