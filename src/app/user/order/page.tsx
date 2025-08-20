@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Header from "@/components/user/Header";
 
 export default function CustomerOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -65,9 +66,54 @@ export default function CustomerOrdersPage() {
 
     setLoading(false);
   }
+  async function cancelOrder(order: any) {
+    // 1) Update order status to cancelled
+    const { error: orderError } = await supabase
+      .from("orders")
+      .update({ status: "cancelled" })
+      .eq("id", order.id);
+
+    if (orderError) {
+      console.error("Error cancelling order:", orderError);
+      return;
+    }
+
+    // 2) Restore stock for each order item
+    for (const item of order.order_items) {
+      const productId = item.products.id;
+      const { data: product, error: productError } = await supabase
+        .from("products")
+        .select("sizes")
+        .eq("id", productId)
+        .single();
+
+      if (productError || !product) {
+        console.error("Error fetching product:", productError);
+        continue;
+      }
+
+      // Find the size ordered and add stock back
+      const updatedSizes = product.sizes.map((s: any) =>
+        s.size === item.size ? { ...s, stock: s.stock + item.quantity } : s
+      );
+
+      const { error: updateError } = await supabase
+        .from("products")
+        .update({ sizes: updatedSizes })
+        .eq("id", productId);
+
+      if (updateError) {
+        console.error("Error restoring stock:", updateError);
+      }
+    }
+
+    // Refresh orders list
+    fetchCustomerOrders();
+  }
 
   return (
-    <section className="p-6 bg-gray-50">
+    <section className="p-6 min-h-screen w-full">
+      <Header />
       <h1 className="text-2xl font-bold mb-6">My Orders</h1>
 
       {loading && <p>Loading your orders...</p>}
@@ -108,7 +154,8 @@ export default function CustomerOrdersPage() {
                 </div>
 
                 {/* Order details */}
-                <div>
+                <div className="flex justify-between h-full">
+                  <div>
                   <p className="text-sm mb-2">
                     <strong>Address:</strong> {order.street}, {order.city}
                   </p>
@@ -119,6 +166,17 @@ export default function CustomerOrdersPage() {
                     <strong>Status:</strong>{" "}
                     <span className="capitalize">{order.status}</span>
                   </p>
+                  </div>
+                  <div className="flex flex-col items-end justify-end w-[100%]">
+                    {order.status === "pending" && (
+                      <button
+                        onClick={() => cancelOrder(order)}
+                        className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                      >
+                        Cancel Order
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

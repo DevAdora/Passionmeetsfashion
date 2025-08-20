@@ -28,13 +28,14 @@ export default function AdminInventoryPage() {
     { label: "Large", stock: 0 },
   ]);
   const [price, setPrice] = useState("");
+  const [category, setCategory] = useState(""); // NEW
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
   async function handleImageUpload(file: File) {
     const fileName = `${Date.now()}-${file.name}`;
     const { data, error } = await supabase.storage
-      .from("product-images") // make sure you created this bucket
+      .from("product-images")
       .upload(fileName, file);
 
     if (error) {
@@ -63,7 +64,7 @@ export default function AdminInventoryPage() {
   }
 
   async function addProduct() {
-    if (!name || !price || !imageFile) {
+    if (!name || !price || !imageFile || !category) {
       alert("Please fill in all required fields");
       return;
     }
@@ -82,6 +83,7 @@ export default function AdminInventoryPage() {
         description,
         colors,
         sizes,
+        category, // NEW
         price: parseFloat(price),
         image_url: imageUrl,
       },
@@ -99,9 +101,9 @@ export default function AdminInventoryPage() {
         { label: "Large", stock: 0 },
       ]);
       setPrice("");
+      setCategory(""); // reset
       setImageFile(null);
 
-      // Refresh the list instead of calling a parent prop
       fetchProducts();
     } else {
       console.error(error);
@@ -139,6 +141,11 @@ export default function AdminInventoryPage() {
                 onChange={(e) => setDescription(e.target.value)}
               />
               <Input
+                placeholder="Category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              /> {/* NEW */}
+              <Input
                 placeholder="Colors (comma separated)"
                 value={colors.join(", ")}
                 onChange={(e) =>
@@ -171,7 +178,6 @@ export default function AdminInventoryPage() {
                 ))}
               </div>
 
-              {/* Image Upload */}
               <Input
                 type="file"
                 accept="image/*"
@@ -212,6 +218,9 @@ export default function AdminInventoryPage() {
                 <div className="ml-4 flex-1">
                   <h2 className="text-lg font-semibold mt-2">{product.name}</h2>
                   <p className="text-sm text-gray-600">{product.description}</p>
+                  <p className="text-xs text-gray-500">
+                    Category: {product.category}
+                  </p> {/* NEW */}
                 </div>
                 <div className="mt-2 gap-2">
                   {product.colors?.map((color: string, idx: number) => (
