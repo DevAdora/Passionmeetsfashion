@@ -68,6 +68,8 @@ export default function CheckoutPage() {
     fetchUserProfile();
   }, []);
 
+
+
   function applyVoucher() {
     if (voucher === "DISCOUNT10") {
       setDiscount(totalPrice * 0.1);
@@ -164,6 +166,19 @@ export default function CheckoutPage() {
         if (updateError) {
           console.error("Error updating stock:", updateError);
         }
+      }
+
+      const { error: clearCartError } = await supabase
+        .from("cart_items")
+        .delete()
+        .in(
+          "id",
+          items.map((i: any) => i.id)
+        )
+        .eq("user_id", user.id);
+
+      if (clearCartError) {
+        console.error("Error clearing cart:", clearCartError);
       }
 
       alert("Order placed successfully!");

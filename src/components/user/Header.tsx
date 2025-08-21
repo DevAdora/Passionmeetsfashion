@@ -50,18 +50,20 @@ export default function Header() {
         {/* Burger + Cart */}
         <div className="flex items-center gap-4">
           {/* Cart Icon */}
-          <button
-            className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-all hover:scale-105"
-            style={{ backgroundColor: "#323333" }}
-            aria-label="Cart"
-          >
-            <ShoppingCart className="w-6 h-6" style={{ color: "#f0ede4" }} />
-            {cartCount > 0 && (
+            <Link href="/cart" passHref>
+            <button
+              className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-all hover:scale-105"
+              style={{ backgroundColor: "#323333" }}
+              aria-label="Cart"
+            >
+              <ShoppingCart className="w-6 h-6" style={{ color: "#f0ede4" }} />
+              {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
                 {cartCount}
               </span>
-            )}
-          </button>
+              )}
+            </button>
+            </Link>
 
           {/* Burger */}
           <button

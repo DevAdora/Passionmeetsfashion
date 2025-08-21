@@ -68,7 +68,9 @@ export default function CartPage() {
 
     // Pass data to checkout page (you can use state, context, or query params)
     router.push(
-      `/user/checkout?items=${encodeURIComponent(JSON.stringify(selectedProducts))}`
+      `/user/checkout?items=${encodeURIComponent(
+        JSON.stringify(selectedProducts)
+      )}`
     );
   };
 
@@ -78,7 +80,10 @@ export default function CartPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="text-center py-10 text-black">Your cart is empty.</div>
+      <div>
+        <Header />
+        <div className="text-center py-10 text-black">Your cart is empty.</div>
+      </div>
     );
   }
 

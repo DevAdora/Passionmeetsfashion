@@ -25,7 +25,6 @@ export default function RegisterForm() {
     setLoading(true);
     setError(null);
 
-    // Create user with Supabase Auth
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
@@ -44,12 +43,11 @@ export default function RegisterForm() {
       return;
     }
 
-    // Insert extra profile details
     const { error: profileError } = await supabase.from("profiles").insert([
       {
-        id: user.id, // must match auth user id
+        id: user.id, 
         username: name,
-        role: "user", // default role
+        role: "user",
         street,
         city,
         province,
@@ -65,7 +63,7 @@ export default function RegisterForm() {
     }
 
     alert("Registration successful! Please log in.");
-    router.replace("/auth/login"); // redirect to login page
+    router.replace("/auth/login");
     setLoading(false);
   };
 
@@ -161,7 +159,7 @@ export default function RegisterForm() {
       <div className="text-center">
         <a
           href="/auth/login"
-          className="text-blue-600 hover:underline text-sm"
+          className=" hover:underline text-sm"
         >
           Already have an account? Log in
         </a>

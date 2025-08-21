@@ -5,7 +5,7 @@ export default function NewArrivals() {
       <div
         className="flex-1 bg-cover bg-center"
         style={{
-          backgroundImage: "url('/assets/Passion meets Fashion (1).png')", // Replace with your image
+          backgroundImage: "url('/assets/passion-meets-fashion1.png')", // Replace with your image
         }}
       ></div>
 
@@ -13,7 +13,7 @@ export default function NewArrivals() {
       <div
         className="flex-1 bg-cover bg-center"
         style={{
-          backgroundImage: "url('/assets/Passion meets Fashion (2).png')", // Replace with your image
+          backgroundImage: "url('/assets/passion-meets-fashion2.png')", // Replace with your image
         }}
       ></div>
 

@@ -42,10 +42,9 @@ export default function LoginForm() {
       return;
     }
 
-    // Redirect based on role
 
     if (profile.role === "admin") {
-      router.replace("/admin/dashboard"); // replace instead of push
+      router.replace("/admin/dashboard"); 
     } else {
       router.replace("/user/dashboard");
     }
@@ -83,8 +82,8 @@ export default function LoginForm() {
         {loading ? "Logging in..." : "Log In"}
       </Button>
 
-      <div>
-        <a href="/auth/register" className="text-blue-600 hover:underline">
+      <div className="text-center">
+        <a href="/auth/register" className=" hover:underline">
           Sign up
         </a>
       </div>
