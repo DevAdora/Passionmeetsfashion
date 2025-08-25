@@ -26,18 +26,18 @@ export default function CategoriesSection() {
 
   return (
     <section className="container min-h-full w-full b flex flex-col justify-start items-start py-12 px-6 mx-auto mt-8">
-      <h1 className="text-[4rem] font-bold mb-12 tracking-wide text-black uppercase">
+      <h1 className="text-[4rem] font-bold mb-12 tracking-wide text-black uppercase ">
         Categories
       </h1>
-      <div className="gap-10 w-full">
+      <div className="gap-10 w-full ">
         {categories.map((category) => (
           <div
             key={category.name}
-            className="items-center w-full border-b border-black pb-6 mb-6"
+            className="items-center w-full border-b border-black pb-6 mb-6 "
           >
             <button
               onClick={() => toggleCategory(category.name)}
-              className="text-4xl font-bold text-black hover:text-black transition"
+              className="text-4xl font-bold text-black hover:text-black transition cursor-pointer"
             >
               {category.name}
             </button>

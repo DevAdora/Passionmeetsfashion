@@ -27,7 +27,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="text-black py-12 px-8 md:px-16 text-sm font-light relative">
+    <footer className="text-black py-12 px-8 md:px-16 text-sm font-light relative xl:container xl:mx-auto ">
       <div className="grid grid-cols-3 md:grid-cols-3 gap-12 border-b border-gray-300 pb-8">
         {/* Menu */}
         <div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import addToCart from "@/app/api/addToCart";
+import Link from "next/link";
 
 interface ProductCardProps {
   id: string;
@@ -10,7 +11,7 @@ interface ProductCardProps {
   price: number;
   description: string;
   colors: string[];
-  sizes: { label: string; stock: number }[]; // ✅ match DB
+  sizes: { label: string; stock: number }[]; 
 }
 
 export default function ProductCard({
@@ -34,28 +35,29 @@ export default function ProductCard({
 
   return (
     <>
-      {/* Product Card */}
-      <div className="border rounded-lg shadow hover:shadow-lg transition overflow-hidden">
-        <img src={image} alt={name} className="w-full h-60 object-contain" />
-        <div className="p-4">
-          <h3 className="text-lg font-semibold text-black">{name}</h3>
-          <p className="text-gray-600">₱{price.toLocaleString()}</p>
-          <div className="mt-4 flex gap-2">
-            <button
-              onClick={() => handleActionClick("cart")}
-              className="flex-1 px-4 py-2 border rounded text-black hover:bg-gray-100"
-            >
-              Add to Cart
-            </button>
-            <button
-              onClick={() => handleActionClick("buy")}
-              className="flex-1 px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-            >
-              Buy Now
-            </button>
+      <Link href={`/user/details/${id}`}>
+        <div className="border border-black shadow hover:shadow-lg transition overflow-hidden">
+          <img src={image} alt={name} className="w-full h-60 object-contain" />
+          <div className="p-4">
+            <h3 className="text-lg font-semibold text-black">{name}</h3>
+            <p className="text-gray-600">₱{price.toLocaleString()}</p>
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => handleActionClick("cart")}
+                className="flex-1 px-4 py-2 border rounded text-black hover:bg-gray-100"
+              >
+                Add to Cart
+              </button>
+              <button
+                onClick={() => handleActionClick("buy")}
+                className="flex-1 px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+              >
+                Buy Now
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </Link>
 
       {/* Modal */}
       {modalOpen && (

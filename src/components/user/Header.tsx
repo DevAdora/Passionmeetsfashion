@@ -5,10 +5,10 @@ import { ShoppingCart } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const navItems = [
-  { name: "Home, ", path: "/user/dashboard" },
-  { name: "Orders, ", path: "/user/order" },
-  { name: "Profile, ", path: "/user/profile" },
-  { name: "Cart, ", path: "/cart" },
+  { name: "Home ", path: "/user/dashboard" },
+  { name: "Orders ", path: "/user/order" },
+  { name: "Profile ", path: "/user/profile" },
+  { name: "Cart ", path: "/cart" },
   { name: "Logout", path: "/auth/login" },
 ];
 

@@ -18,14 +18,12 @@ export default function ProductGrid() {
   async function fetchProducts() {
     setLoading(true);
 
-    // ✅ Fetch latest 4 for New Arrivals
     const { data: arrivalsData } = await supabase
       .from("products")
       .select("*")
       .order("created_at", { ascending: false })
       .limit(4);
 
-    // ✅ Fetch Men products
     const { data: menData } = await supabase
       .from("products")
       .select("*")
@@ -33,7 +31,6 @@ export default function ProductGrid() {
       .order("created_at", { ascending: false })
       .limit(4);
 
-    // ✅ Fetch Women products
     const { data: womenData } = await supabase
       .from("products")
       .select("*")
@@ -41,7 +38,6 @@ export default function ProductGrid() {
       .order("created_at", { ascending: false })
       .limit(4);
 
-    // ✅ Fetch Accessories
     const { data: accessoriesData } = await supabase
       .from("products")
       .select("*")
