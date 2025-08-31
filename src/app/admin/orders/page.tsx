@@ -1,59 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import fetchOrders from "@/app/api/admin/fetchOrders";
+import confirmOrder from "@/app/api/admin/confirmOrder";
+import { Order } from "@/types/order";
 
 export default function AdminOrderPage() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchOrders();
+    loadOrders();
   }, []);
 
-  async function fetchOrders() {
+  async function loadOrders() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("orders")
-      .select(
-        `
-        id,
-        full_name,
-        street,
-        city,
-        payment_method,
-        status,
-        order_items (
-          quantity,
-          products (
-            id,
-            name,
-            image_url,
-            price
-          )
-        )
-      `
-      )
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching orders:", error);
-    } else {
-      setOrders(data || []);
-    }
+    const data = await fetchOrders();
+    setOrders(data);
     setLoading(false);
   }
 
-  async function confirmOrder(orderId: string) {
-    const { error } = await supabase
-      .from("orders")
-      .update({ status: "shipped" })
-      .eq("id", orderId);
-
-    if (error) {
-      console.error("Error updating order:", error);
-    } else {
-      fetchOrders(); // refresh orders
+  async function handleConfirm(orderId: string) {
+    const success = await confirmOrder(orderId);
+    if (success) {
+      loadOrders(); // refresh orders after update
     }
   }
 
@@ -79,33 +49,36 @@ export default function AdminOrderPage() {
                     Order ID: {order.id}
                   </h1>
 
-                  {/* Order items */}
-                  {order.order_items.map((item: any, idx: number) => (
+                  {order.order_items.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3 mt-2">
-                      {item.products?.image_url && (
-                        <img
-                          src={item.products.image_url}
-                          alt={item.products.name}
-                          className="w-16 h-16 rounded-md object-cover"
-                        />
+                      {item.products && (
+                        <>
+                          <img
+                            src={item.products.image_url}
+                            alt={item.products.name}
+                            className="w-16 h-16 rounded-md object-cover"
+                          />
+                          <div>
+                            <h2 className="font-semibold">
+                              {item.products.name}
+                            </h2>
+                            <p className="text-sm text-gray-700">
+                              Qty: {item.quantity} × ${item.products.price}
+                            </p>
+                          </div>
+                        </>
                       )}
-                      <div>
-                        <h2 className="font-semibold">{item.products?.name}</h2>
-                        <p className="text-sm text-gray-700">
-                          Qty: {item.quantity} × ${item.products?.price}
-                        </p>
-                      </div>
                     </div>
                   ))}
                 </div>
+
                 {/* Customer details */}
                 <div className="w-full">
                   <p className="text-[1rem] mb-4">
                     <strong>Customer:</strong> {order.full_name}
                   </p>
                   <p className="text-[1rem] mb-4">
-                    <strong>Address:</strong> {order.street}, {order.city},{" "}
-                    {order.country}
+                    <strong>Address:</strong> {order.street}, {order.city}
                   </p>
                   <p className="text-[1rem] mb-4">
                     <strong>Payment:</strong> {order.payment_method}
@@ -120,8 +93,8 @@ export default function AdminOrderPage() {
                 <div className="flex flex-col items-end h-full justify-end ">
                   {order.status === "pending" ? (
                     <button
-                      onClick={() => confirmOrder(order.id)}
-                      className="bg-black text-white px-4 py-2 rounded-lg shadow-md  transition cursor-pointer"
+                      onClick={() => handleConfirm(order.id)}
+                      className="bg-black text-white px-4 py-2 rounded-lg shadow-md transition cursor-pointer"
                     >
                       Confirm & Ship
                     </button>
