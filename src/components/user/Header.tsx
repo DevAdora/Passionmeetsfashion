@@ -24,7 +24,6 @@ export default function Header() {
     setIsMobileMenuOpen(false);
   };
 
-  // Fetch cart count
   useEffect(() => {
     async function fetchCartCount() {
       const {
@@ -47,10 +46,8 @@ export default function Header() {
   return (
     <>
       <header className="fixed top-0 left-0 w-full z-50 px-6 py-4 flex justify-end">
-        {/* Burger + Cart */}
         <div className="flex items-center gap-4">
-          {/* Cart Icon */}
-            <Link href="/cart" passHref>
+            <Link href="/user/cart" passHref>
             <button
               className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-all hover:scale-105"
               style={{ backgroundColor: "#323333" }}
