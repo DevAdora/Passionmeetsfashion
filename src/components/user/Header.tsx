@@ -8,7 +8,7 @@ const navItems = [
   { name: "Home ", path: "/user/dashboard" },
   { name: "Orders ", path: "/user/order" },
   { name: "Profile ", path: "/user/profile" },
-  { name: "Cart ", path: "/cart" },
+  { name: "Cart ", path: "/user/cart" },
   { name: "Logout", path: "/auth/login" },
 ];
 
@@ -65,7 +65,6 @@ export default function Header() {
             </button>
             </Link>
 
-          {/* Burger */}
           <button
             onClick={toggleMobileMenu}
             className={`w-14 h-14 rounded-full flex flex-col justify-center items-center transition-all hover:scale-105 shadow-lg cursor-pointer ${
@@ -96,7 +95,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Backdrop */}
       <div
         className={`fixed inset-0 bg-black/50 z-40 transition-all duration-500 ease-in-out ${
           isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
@@ -104,7 +102,6 @@ export default function Header() {
         onClick={closeMobileMenu}
       ></div>
 
-      {/* Side Menu Panel */}
       <div
         className={`fixed top-0 right-0 w-full md:w-[50%] min-w-[280px] h-full z-50 transform transition-all duration-500 ease-in-out ${
           isMobileMenuOpen
