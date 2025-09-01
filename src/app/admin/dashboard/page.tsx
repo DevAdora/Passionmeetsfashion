@@ -11,9 +11,6 @@ import {
 } from "recharts";
 
 import { useState, useEffect } from "react";
-import fetchOrderCounts from "@/app/api/admin/fetchOrderCounts/route";
-import fetchStockNumbers from "@/app/api/admin/fetchStockNumbers/route";
-import fetchOrderCategories from "@/app/api/admin/fetchOrderCategories/route";
 
 export default function AdminDashboardPage() {
   const [counts, setCounts] = useState({
@@ -30,14 +27,21 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      const orders = await fetchOrderCounts();
-      setCounts(orders);
+      try {
+        const resCounts = await fetch("/api/admin/counts");
+        const countsData = await resCounts.json();
+        setCounts(countsData);
 
-      const stock = await fetchStockNumbers();
-      setStockData(stock);
+        const resStock = await fetch("/api/admin/stock");
+        const stockData = await resStock.json();
+        setStockData(stockData);
 
-      const categories = await fetchOrderCategories();
-      setOrderCategories(categories);
+        const resCategories = await fetch("/api/admin/categories");
+        const categoriesData = await resCategories.json();
+        setOrderCategories(categoriesData);
+      } catch (err) {
+        console.error("Error loading dashboard data:", err);
+      }
     };
 
     loadData();

@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import fetchMonthlySales from "@/app/api/admin/sales/fetchMonthlySales";
-import fetchProductSales from "@/app/api/admin/sales/fetchProductSales";
+
 import {
   LineChart,
   Line,
@@ -27,11 +26,17 @@ export default function SalesPage() {
 
   useEffect(() => {
     const loadSales = async () => {
-      const monthly = await fetchMonthlySales();
-      setMonthlySales(monthly);
+      try {
+        const monthly = await fetch("/api/admin/sales/monthly");
+        const monthlyData = await monthly.json();
+        setMonthlySales(monthlyData);
 
-      const products = await fetchProductSales();
-      setProductSales(products);
+        const products = await fetch("/api/admin/sales/products");
+        const productsData = await products.json();
+        setProductSales(productsData);
+      } catch (err) {
+        console.error("Error loading dashboard data:", err);
+      }
     };
 
     loadSales();

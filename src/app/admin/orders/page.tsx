@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import fetchOrders from "@/app/api/admin/fetchOrders/route";
-import confirmOrder from "@/app/api/admin/confirmOrder/route";
 import { Order } from "@/types/order";
 
 export default function AdminOrderPage() {
@@ -15,15 +13,22 @@ export default function AdminOrderPage() {
 
   async function loadOrders() {
     setLoading(true);
-    const data = await fetchOrders();
+    const res = await fetch("/api/admin/fetchOrders");
+    const data = await res.json();
     setOrders(data);
     setLoading(false);
   }
 
   async function handleConfirm(orderId: string) {
-    const success = await confirmOrder(orderId);
+    const res = await fetch("/api/admin/confirmOrder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId }),
+    });
+
+    const { success } = await res.json();
     if (success) {
-      loadOrders(); 
+      loadOrders();
     }
   }
 
@@ -38,17 +43,11 @@ export default function AdminOrderPage() {
           <div className="text-gray-500">No orders found</div>
         ) : (
           orders.map((order) => (
-            <div
-              key={order.id}
-              className="bg-gray-450 p-6 rounded-xl shadow-md text-black"
-            >
+            <div key={order.id} className="bg-gray-450 p-6 rounded-xl shadow-md text-black">
               <div className="justify-between grid grid-cols-3 items-start gap-4">
-                {/* Left side: order details */}
+                {/* Order details */}
                 <div>
-                  <h1 className="font-semibold text-[1rem]">
-                    Order ID: {order.id}
-                  </h1>
-
+                  <h1 className="font-semibold text-[1rem]">Order ID: {order.id}</h1>
                   {order.order_items.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3 mt-2">
                       {item.products && (
@@ -59,9 +58,7 @@ export default function AdminOrderPage() {
                             className="w-16 h-16 rounded-md object-cover"
                           />
                           <div>
-                            <h2 className="font-semibold">
-                              {item.products.name}
-                            </h2>
+                            <h2 className="font-semibold">{item.products.name}</h2>
                             <p className="text-sm text-gray-700">
                               Qty: {item.quantity} × ${item.products.price}
                             </p>
@@ -89,8 +86,8 @@ export default function AdminOrderPage() {
                   </p>
                 </div>
 
-                {/* Right side: payment + action */}
-                <div className="flex flex-col items-end h-full justify-end ">
+                {/* Actions */}
+                <div className="flex flex-col items-end h-full justify-end">
                   {order.status === "pending" ? (
                     <button
                       onClick={() => handleConfirm(order.id)}

@@ -2,13 +2,13 @@
 
 import Header from "@/components/user/Header";
 import { useSearchParams } from "next/navigation";
-import { useMemo, useState, useEffect } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
 import applyVoucher from "@/app/api/user/applyVoucher";
 import fetchUserProfile from "@/app/api/user/fetchUserProfile";
 import handlePlaceOrder from "@/app/api/user/handlePlaceOrder";
 import type { CartItem } from "@/app/api/user/handlePlaceOrder";
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const [discount, setDiscount] = useState(0);
   const [voucher, setVoucher] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cod");
@@ -242,5 +242,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div>Loading checkout...</div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }
