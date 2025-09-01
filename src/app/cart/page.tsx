@@ -5,6 +5,9 @@ import { supabase } from "@/lib/supabase";
 import Header from "@/components/user/Header";
 import { useRouter } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
+
 type CartItem = {
   id: number;
   product_id: string;
