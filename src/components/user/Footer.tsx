@@ -22,9 +22,9 @@ export default function Footer() {
     return () => clearInterval(interval);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  // const scrollToTop = () => {
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  // };
 
   return (
     <footer className="text-black py-12 px-8 md:px-16 text-sm font-light relative xl:container xl:mx-auto ">

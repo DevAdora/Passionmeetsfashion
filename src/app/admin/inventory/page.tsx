@@ -13,12 +13,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import addProduct from "@/app/api/admin/addProduct";
+import fetchProducts from "@/app/api/admin/fetchProducts";
+import { Product } from "@/types/product";
 
 export default function AdminInventoryPage() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Form state
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [colors, setColors] = useState<string[]>([]);
@@ -28,91 +30,62 @@ export default function AdminInventoryPage() {
     { label: "Large", stock: 0 },
   ]);
   const [price, setPrice] = useState("");
-  const [category, setCategory] = useState(""); // NEW
+  const [category, setCategory] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-
-  async function handleImageUpload(file: File) {
-    const fileName = `${Date.now()}-${file.name}`;
-    const { data, error } = await supabase.storage
-      .from("product-images")
-      .upload(fileName, file);
-
-    if (error) {
-      console.error("Error uploading image:", error);
-      return null;
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("product-images").getPublicUrl(fileName);
-
-    return publicUrl;
-  }
 
   useEffect(() => {
-    fetchProducts();
+    loadProducts();
   }, []);
 
-  async function fetchProducts() {
+  async function loadProducts() {
     setLoading(true);
-    const { data, error } = await supabase.from("products").select("*");
-    if (!error) {
-      setProducts(data);
-    }
+    const data = await fetchProducts();
+    setProducts(data);
     setLoading(false);
   }
 
-  async function addProduct() {
-    if (!name || !price || !imageFile || !category) {
+  async function handleAddProduct() {
+    if (!imageFile || !name || !price || !category) {
       alert("Please fill in all required fields");
       return;
     }
 
-    setUploading(true);
+    const result = await addProduct({
+      name,
+      description,
+      colors,
+      sizes,
+      category,
+      price: parseFloat(price),
+      imageFile,
+    });
 
-    const imageUrl = await handleImageUpload(imageFile);
-    if (!imageUrl) {
-      setUploading(false);
-      return;
-    }
-
-    const { error } = await supabase.from("products").insert([
-      {
-        name,
-        description,
-        colors,
-        sizes,
-        category, // NEW
-        price: parseFloat(price),
-        image_url: imageUrl,
-      },
-    ]);
-
-    setUploading(false);
-
-    if (!error) {
-      setName("");
-      setDescription("");
-      setColors([]);
-      setSizes([
-        { label: "Small", stock: 0 },
-        { label: "Medium", stock: 0 },
-        { label: "Large", stock: 0 },
-      ]);
-      setPrice("");
-      setCategory(""); // reset
-      setImageFile(null);
-
-      fetchProducts();
+    if (!result.error) {
+      alert("Product added!");
+      loadProducts();
+      resetForm();
     } else {
-      console.error(error);
+      alert("Error adding product");
     }
+  }
+
+  function resetForm() {
+    setName("");
+    setDescription("");
+    setColors([]);
+    setSizes([
+      { label: "Small", stock: 0 },
+      { label: "Medium", stock: 0 },
+      { label: "Large", stock: 0 },
+    ]);
+    setPrice("");
+    setCategory("");
+    setImageFile(null);
   }
 
   async function deleteProduct(id: string) {
     await supabase.from("products").delete().eq("id", id);
-    fetchProducts();
+    loadProducts();
   }
 
   return (
@@ -144,7 +117,7 @@ export default function AdminInventoryPage() {
                 placeholder="Category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-              /> {/* NEW */}
+              />
               <Input
                 placeholder="Colors (comma separated)"
                 value={colors.join(", ")}
@@ -169,7 +142,8 @@ export default function AdminInventoryPage() {
                       value={size.stock}
                       onChange={(e) => {
                         const updated = [...sizes];
-                        updated[index].stock = parseInt(e.target.value) || 0;
+                        updated[index].stock =
+                          parseInt(e.target.value) || 0;
                         setSizes(updated);
                       }}
                       placeholder="Stock"
@@ -177,7 +151,6 @@ export default function AdminInventoryPage() {
                   </div>
                 ))}
               </div>
-
               <Input
                 type="file"
                 accept="image/*"
@@ -193,7 +166,7 @@ export default function AdminInventoryPage() {
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
-              <Button onClick={addProduct}>Save</Button>
+              <Button onClick={handleAddProduct}>Save</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -203,13 +176,13 @@ export default function AdminInventoryPage() {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1">
+        <div className="grid gap-6">
           {products.map((product) => (
             <div
               key={product.id}
               className="bg-white shadow-md rounded-lg p-4 flex justify-between"
             >
-              <div className="w-[40%] flex">
+              <div className="flex w-[40%]">
                 <img
                   src={product.image_url}
                   alt={product.name}
@@ -220,37 +193,36 @@ export default function AdminInventoryPage() {
                   <p className="text-sm text-gray-600">{product.description}</p>
                   <p className="text-xs text-gray-500">
                     Category: {product.category}
-                  </p> {/* NEW */}
-                </div>
-                <div className="mt-2 gap-2">
-                  {product.colors?.map((color: string, idx: number) => (
-                    <Badge key={idx} variant="secondary">
-                      {color}
-                    </Badge>
-                  ))}
+                  </p>
+                  <div className="mt-2 gap-2 flex flex-wrap">
+                    {product.colors?.map((color: string, idx: number) => (
+                      <Badge key={idx} variant="secondary">
+                        {color}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
-
-              <div className="mt-2 gap-2">
-                {product.sizes?.map((sizeObj: any, idx: number) => (
-                  <Badge key={idx}>
-                    {sizeObj.label} ({sizeObj.stock})
-                  </Badge>
-                ))}
+              <div className="mt-2 gap-2 flex flex-wrap">
+                {product.sizes?.map(
+                  (sizeObj: { label: string; stock: number }, idx: number) => (
+                    <Badge key={idx}>
+                      {sizeObj.label} ({sizeObj.stock})
+                    </Badge>
+                  )
+                )}
               </div>
               <p className="mt-2 font-bold">${product.price}</p>
 
               <div className="flex gap-2 mt-4">
                 <Button
                   variant="outline"
-                  className="flex-1"
-                  onClick={() => alert("Edit functionality coming soon")}
+                  onClick={() => alert("Edit coming soon")}
                 >
                   Edit
                 </Button>
                 <Button
                   variant="destructive"
-                  className="flex-1"
                   onClick={() => deleteProduct(product.id)}
                 >
                   Delete
