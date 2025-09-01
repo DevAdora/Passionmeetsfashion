@@ -37,7 +37,14 @@ export default function SalesPage() {
     loadSales();
   }, []);
 
-  const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7f50", "#00c49f", "#d0ed57"];
+  const COLORS = [
+    "#8884d8",
+    "#82ca9d",
+    "#ffc658",
+    "#ff7f50",
+    "#00c49f",
+    "#d0ed57",
+  ];
 
   return (
     <section className="p-6 bg-gray-50 min-h-screen">
@@ -51,32 +58,35 @@ export default function SalesPage() {
             <XAxis dataKey="month" />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="total" stroke="#8884d8" strokeWidth={2} />
+            <Line
+              type="monotone"
+              dataKey="total"
+              stroke="#8884d8"
+              strokeWidth={2}
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow-md">
         <h2 className="text-lg font-semibold mb-4">Sales by Product</h2>
-        <ResponsiveContainer width="100%" height={400}>
-          <PieChart>
-            <Pie
-              data={productSales}
-              dataKey="total"
-              nameKey="product"
-              cx="50%"
-              cy="50%"
-              outerRadius={120}
-              label
-            >
-              {productSales.map((_, index) => (
-                <Cell key={index} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+        <PieChart>
+          <Pie
+            data={productSales}
+            dataKey="total"
+            nameKey="product"
+            cx="50%"
+            cy="50%"
+            outerRadius={120}
+            label
+          >
+            {productSales.map((_, index) => (
+              <Cell key={index} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
       </div>
     </section>
   );

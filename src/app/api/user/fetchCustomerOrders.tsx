@@ -1,7 +1,23 @@
+
 import { supabase } from "@/lib/supabase";
 import { Order } from "@/types/order";
 
-export default async function fetchOrders(): Promise<Order[]> {
+export default async function fetchCustomerOrders(): Promise<Order[]> {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error("Error fetching user:", userError);
+    return [];
+  }
+
+  if (!user) {
+    console.warn("No user logged in");
+    return [];
+  }
+
   const { data, error } = await supabase
     .from("orders")
     .select(
@@ -14,6 +30,7 @@ export default async function fetchOrders(): Promise<Order[]> {
         status,
         order_items (
           quantity,
+          size,
           products (
             id,
             name,
@@ -23,12 +40,13 @@ export default async function fetchOrders(): Promise<Order[]> {
         )
       `
     )
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Error fetching orders:", error);
+    console.error("Error fetching customer orders:", error);
     return [];
   }
 
-  return (data ?? []) as unknown as Order[];
+  return (data ?? []) as unknown as Order[]; 
 }

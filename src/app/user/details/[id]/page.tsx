@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useParams, useRouter } from "next/navigation";
 import Header from "@/components/user/Header";
-import addToCart from "@/app/api/addToCart";
+import addToCart from "@/app/api/user/addToCart";
 import RelatedProducts from "@/components/user/RelatedProduct";
 import Footer from "@/components/user/Footer";
 

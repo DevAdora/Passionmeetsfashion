@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import ProductCard from "@/components/user/Card";
+import { Product } from "@/types/product";
 
 export default function RelatedProducts() {
-  const [related, setRelated] = useState<any[]>([]);
+  const [related, setRelated] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,18 +16,23 @@ export default function RelatedProducts() {
   async function fetchProducts() {
     setLoading(true);
 
-    const { data: relatedData } = await supabase
+    const { data: relatedData, error } = await supabase
       .from("products")
       .select("*")
       .order("created_at", { ascending: false })
       .limit(4);
 
-    setRelated(relatedData || []);
+    if (error) {
+      console.error("Error fetching related products:", error);
+      setRelated([]);
+    } else {
+      setRelated(relatedData as Product[]);
+    }
 
     setLoading(false);
   }
 
-  function renderGrid(products: any[]) {
+  function renderGrid(products: Product[]) {
     if (loading) return <p className="text-black">Loading products...</p>;
     if (products.length === 0)
       return <p className="text-black">No products found.</p>;
