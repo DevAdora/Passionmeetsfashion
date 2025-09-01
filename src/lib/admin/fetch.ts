@@ -1,9 +1,9 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseServer } from "@/lib/server";
 import { Order } from "@/types/order";
 import { Product } from "@/types/product";
 
 export async function fetchOrders(): Promise<Order[]> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseServer
     .from("orders")
     .select(
       `
@@ -40,7 +40,7 @@ export async function fetchOrderCounts() {
 
   const results = await Promise.all(
     statuses.map(async (status) => {
-      const { count, error } = await supabase
+      const { count, error } = await supabaseServer
         .from("orders")
         .select("*", { count: "exact", head: true })
         .eq("status", status);
@@ -62,7 +62,7 @@ export async function fetchOrderCounts() {
 
 
 export async function fetchOrderCategories() {
-  const { data, error } = await supabase.from("order_items").select("product_name");
+  const { data, error } = await supabaseServer.from("order_items").select("product_name");
 
   if (error) {
     console.error("Error fetching order items:", error);
@@ -83,7 +83,7 @@ export async function fetchOrderCategories() {
 
 
 export async function fetchStockNumbers() {
-  const { data, error } = await supabase.from("products").select("*");
+  const { data, error } = await supabaseServer.from("products").select("*");
 
   if (error || !data) {
     console.error("Error fetching products:", error);
@@ -102,7 +102,7 @@ export async function fetchStockNumbers() {
 
 import { MonthlySalesOrder } from "@/types/order";
 
-interface RawSupabaseOrder {
+interface RawsupabaseServerOrder {
   created_at: string;
   order_items: {
     quantity: number;
@@ -118,7 +118,7 @@ export interface MonthlySalesSummary {
 export  async function fetchMonthlySales(): Promise<
   MonthlySalesSummary[]
 > {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseServer
     .from("orders")
     .select("created_at, order_items(quantity, products(price))");
 
@@ -127,7 +127,7 @@ export  async function fetchMonthlySales(): Promise<
     return [];
   }
 
-  const monthlyOrders: MonthlySalesOrder[] = (data as RawSupabaseOrder[]).map(
+  const monthlyOrders: MonthlySalesOrder[] = (data as RawsupabaseServerOrder[]).map(
     (order) => ({
       created_at: order.created_at,
       order_items: order.order_items.map((item) => ({
@@ -163,7 +163,7 @@ export  async function fetchMonthlySales(): Promise<
 
 
 export async function fetchProductSales() {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseServer
     .from("order_items")
     .select("quantity, products(name, price)");
 

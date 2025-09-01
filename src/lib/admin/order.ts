@@ -1,7 +1,7 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseServer } from "@/lib/server";
 
 export default async function confirmOrder(orderId: string): Promise<boolean> {
-  const { error } = await supabase
+  const { error } = await supabaseServer
     .from("orders")
     .update({ status: "shipped" })
     .eq("id", orderId);
