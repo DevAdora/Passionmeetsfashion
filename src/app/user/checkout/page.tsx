@@ -3,21 +3,15 @@
 import Header from "@/components/user/Header";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import applyVoucher from "@/app/api/user/applyVoucher";
+import fetchUserProfile from "@/app/api/user/fetchUserProfile";
+import handlePlaceOrder from "@/app/api/user/handlePlaceOrder";
+import type { CartItem } from "@/app/api/user/handlePlaceOrder";
 
 export default function CheckoutPage() {
-  const searchParams = useSearchParams();
-
-  const items = useMemo(() => {
-    const itemsParam = searchParams.get("items");
-    if (!itemsParam) return [];
-    try {
-      return JSON.parse(itemsParam);
-    } catch (e) {
-      console.error("Error parsing checkout items:", e);
-      return [];
-    }
-  }, [searchParams]);
+  const [discount, setDiscount] = useState(0);
+  const [voucher, setVoucher] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("cod");
 
   const [address, setAddress] = useState({
     fullName: "",
@@ -26,175 +20,58 @@ export default function CheckoutPage() {
     city: "",
     postal: "",
   });
-  const [paymentMethod, setPaymentMethod] = useState("cod");
-  const [voucher, setVoucher] = useState("");
-  const [discount, setDiscount] = useState(0);
+
+  const searchParams = useSearchParams();
+
+  const items: CartItem[] = useMemo(() => {
+    const itemsParam = searchParams.get("items");
+    if (!itemsParam) return [];
+    try {
+      return JSON.parse(itemsParam) as CartItem[];
+    } catch (e) {
+      console.error("Error parsing checkout items:", e);
+      return [];
+    }
+  }, [searchParams]);
 
   const totalPrice = items.reduce(
-    (total: number, item: any) => total + item.price * item.quantity,
+    (total: number, item) => total + item.price * item.quantity,
     0
   );
+
   const finalPrice = totalPrice - discount;
 
   useEffect(() => {
-    async function fetchUserProfile() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("username, phone, street, city, postal")
-        .eq("id", user.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching profile:", error);
-        return;
-      }
-
-      if (profile) {
-        setAddress({
-          fullName: profile.username || "",
-          phone: profile.phone || "",
-          street: profile.street || "",
-          city: profile.city || "",
-          postal: profile.postal || "",
-        });
-      }
-    }
-
-    fetchUserProfile();
+    const loadProfile = async () => {
+      const profile = await fetchUserProfile();
+      if (profile) setAddress(profile);
+    };
+    loadProfile();
   }, []);
 
-
-
-  function applyVoucher() {
-    if (voucher === "DISCOUNT10") {
-      setDiscount(totalPrice * 0.1);
+  const handleApplyVoucher = () => {
+    const result = applyVoucher(voucher);
+    if (result.success) {
+      setDiscount(finalPrice * 0.1);
     } else {
-      setDiscount(0);
-      alert("Invalid voucher code");
+      alert(result.message);
     }
-  }
-  async function handlePlaceOrder() {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        alert("You must be logged in to place an order");
-        return;
-      }
+  };
 
-      const { data: orderData, error: orderError } = await supabase
-        .from("orders")
-        .insert([
-          {
-            user_id: user.id,
-            full_name: address.fullName,
-            phone: address.phone,
-            street: address.street,
-            city: address.city,
-            postal: address.postal,
-            payment_method: paymentMethod,
-            total_price: finalPrice,
-            status: "pending",
-          },
-        ])
-        .select();
-
-      if (orderError || !orderData || orderData.length === 0) {
-        console.error("Order insert error:", orderError);
-        alert("Failed to place order");
-        return;
-      }
-
-      const order = orderData[0];
-
-      const orderItems = items.map((item: any) => ({
-        order_id: order.id,
-        product_id: Number(item.product_id),
-        product_name: item.product_name,
-        price: item.price,
-        quantity: item.quantity,
-        size: item.size,
-        color: item.color,
-      }));
-
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .insert(orderItems);
-
-      if (itemsError) {
-        console.error("Order items insert error:", itemsError);
-        alert("Failed to save order items");
-        return;
-      }
-
-      for (const item of items) {
-        const { data: product, error: fetchError } = await supabase
-          .from("products")
-          .select("sizes")
-          .eq("id", item.product_id)
-          .single();
-
-        if (fetchError || !product) {
-          console.error("Error fetching product sizes:", fetchError);
-          continue;
-        }
-
-        let sizes = product.sizes || [];
-        const updatedSizes = sizes.map((s: any) => {
-          if (s.label === item.size) {
-            if (s.stock < item.quantity) {
-              throw new Error(
-                `Not enough stock for ${item.product_name} - ${item.size}`
-              );
-            }
-            return { ...s, stock: s.stock - item.quantity };
-          }
-          return s;
-        });
-
-        const { error: updateError } = await supabase
-          .from("products")
-          .update({ sizes: updatedSizes })
-          .eq("id", item.product_id);
-
-        if (updateError) {
-          console.error("Error updating stock:", updateError);
-        }
-      }
-
-      const { error: clearCartError } = await supabase
-        .from("cart_items")
-        .delete()
-        .in(
-          "id",
-          items.map((i: any) => i.id)
-        )
-        .eq("user_id", user.id);
-
-      if (clearCartError) {
-        console.error("Error clearing cart:", clearCartError);
-      }
-
-      alert("Order placed successfully!");
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      alert("Something went wrong");
-    }
-  }
+  const placeOrder = async () => {
+    await handlePlaceOrder({
+      address,
+      paymentMethod,
+      finalPrice,
+      items,
+    });
+  };
 
   return (
     <main className="min-h-screen w-full container mx-auto">
       <Header />
       <div className="container mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Checkout Form */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Shipping Address */}
           <div className="bg-white shadow p-6 rounded-lg">
             <h2 className="text-xl font-bold mb-4 text-black">
               Shipping Address
@@ -284,7 +161,7 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Voucher / Discount */}
+          {/* Voucher */}
           <div className="bg-white shadow p-6 rounded-lg">
             <h2 className="text-xl font-bold mb-4 text-black">Voucher</h2>
             <div className="flex gap-2">
@@ -296,7 +173,7 @@ export default function CheckoutPage() {
                 onChange={(e) => setVoucher(e.target.value)}
               />
               <button
-                onClick={applyVoucher}
+                onClick={handleApplyVoucher}
                 className="bg-black text-white px-4 py-2 rounded"
               >
                 Apply
@@ -309,7 +186,7 @@ export default function CheckoutPage() {
         <div className="bg-white shadow p-6 rounded-lg h-fit">
           <h2 className="text-xl font-bold mb-4 text-black">Order Summary</h2>
           <div className="space-y-4">
-            {items.map((item: any) => (
+            {items.map((item) => (
               <div
                 key={item.id}
                 className="flex justify-between items-start border-b pb-2"
@@ -340,7 +217,6 @@ export default function CheckoutPage() {
               </div>
             ))}
 
-            {/* Totals */}
             <div className="flex justify-between font-semibold text-black">
               <span>Subtotal</span>
               <span>₱{totalPrice.toLocaleString()}</span>
@@ -356,9 +232,8 @@ export default function CheckoutPage() {
               <span>₱{finalPrice.toLocaleString()}</span>
             </div>
 
-            {/* Place Order Button */}
             <button
-              onClick={handlePlaceOrder}
+              onClick={placeOrder}
               className="bg-black text-white w-full py-3 rounded-lg font-semibold mt-4"
             >
               Place Order

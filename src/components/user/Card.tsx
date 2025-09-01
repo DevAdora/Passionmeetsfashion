@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import addToCart from "@/app/api/addToCart";
+import addToCart from "@/app/api/user/addToCart";
 import Link from "next/link";
 
 interface ProductCardProps {
@@ -63,7 +63,6 @@ export default function ProductCard({
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg max-w-lg w-full p-6 relative">
-            {/* Close button */}
             <button
               onClick={() => setModalOpen(false)}
               className="absolute top-3 right-3 text-black hover:text-black"
@@ -71,7 +70,6 @@ export default function ProductCard({
               ✕
             </button>
 
-            {/* Modal Content */}
             <h2 className="text-black text-xl font-bold mb-4">{name}</h2>
             <img
               src={image}
@@ -83,7 +81,6 @@ export default function ProductCard({
               ₱{price.toLocaleString()}
             </p>
 
-            {/* Color selection */}
             <div className="mb-4">
               <p className="font-medium mb-1 text-black">Color:</p>
               <div className="flex gap-2">
@@ -100,7 +97,6 @@ export default function ProductCard({
               </div>
             </div>
 
-            {/* Size selection */}
             <div className="mb-6">
               <p className="font-medium mb-1 text-black">Size:</p>
               <div className="flex gap-2">
@@ -113,7 +109,7 @@ export default function ProductCard({
                         : "bg-white text-black"
                     }`}
                     onClick={() => setSelectedSize(size.label)}
-                    disabled={size.stock <= 0} // optionally disable out-of-stock
+                    disabled={size.stock <= 0}
                   >
                     {size.label} ({size.stock})
                   </button>
@@ -121,8 +117,7 @@ export default function ProductCard({
               </div>
             </div>
 
-            {/* Action Button */}
-            {/* Action Button */}
+        
             <button
               onClick={async () => {
                 if (actionType === "cart") {

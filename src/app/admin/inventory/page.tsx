@@ -15,12 +15,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import addProduct from "@/app/api/admin/addProduct";
 import fetchProducts from "@/app/api/admin/fetchProducts";
+import { Product } from "@/types/product";
 
 export default function AdminInventoryPage() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Form state
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [colors, setColors] = useState<string[]>([]);
@@ -33,7 +33,6 @@ export default function AdminInventoryPage() {
   const [category, setCategory] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  // Load products on mount
   useEffect(() => {
     loadProducts();
   }, []);

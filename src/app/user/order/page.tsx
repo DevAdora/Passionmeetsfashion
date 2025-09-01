@@ -1,114 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import Header from "@/components/user/Header";
+import fetchCustomerOrders from "@/app/api/user/fetchCustomerOrders";
+import cancelOrder from "@/app/api/user/cancelOrder";
+import { Order } from "@/types/order";
 
 export default function CustomerOrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchCustomerOrders();
-  }, []);
-
-  async function fetchCustomerOrders() {
+  async function loadOrders() {
     setLoading(true);
-
-    // ✅ Get current user
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError) {
-      console.error("Error fetching user:", userError);
-      setLoading(false);
-      return;
-    }
-
-    if (!user) {
-      console.warn("No user logged in");
-      setLoading(false);
-      return;
-    }
-
-    // ✅ Fetch only this user's orders
-    const { data, error } = await supabase
-      .from("orders")
-      .select(
-        `
-        id,
-        full_name,
-        street,
-        city,
-        payment_method,
-        status,
-        order_items (
-          quantity,
-          products (
-            id,
-            name,
-            image_url,
-            price
-          )
-        )
-      `
-      )
-      .eq("user_id", user.id) // ✅ filter by logged-in user
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching customer orders:", error);
-    } else {
-      setOrders(data || []);
-    }
-
+    const data = await fetchCustomerOrders();
+    setOrders(data);
     setLoading(false);
   }
-  async function cancelOrder(order: any) {
-    // 1) Update order status to cancelled
-    const { error: orderError } = await supabase
-      .from("orders")
-      .update({ status: "cancelled" })
-      .eq("id", order.id);
 
-    if (orderError) {
-      console.error("Error cancelling order:", orderError);
-      return;
+  useEffect(() => {
+    loadOrders();
+  }, []);
+
+  async function handleCancel(order: Order) {
+    const success = await cancelOrder(order);
+    if (success) {
+      await loadOrders(); // refresh orders after cancellation
     }
-
-    // 2) Restore stock for each order item
-    for (const item of order.order_items) {
-      const productId = item.products.id;
-      const { data: product, error: productError } = await supabase
-        .from("products")
-        .select("sizes")
-        .eq("id", productId)
-        .single();
-
-      if (productError || !product) {
-        console.error("Error fetching product:", productError);
-        continue;
-      }
-
-      // Find the size ordered and add stock back
-      const updatedSizes = product.sizes.map((s: any) =>
-        s.size === item.size ? { ...s, stock: s.stock + item.quantity } : s
-      );
-
-      const { error: updateError } = await supabase
-        .from("products")
-        .update({ sizes: updatedSizes })
-        .eq("id", productId);
-
-      if (updateError) {
-        console.error("Error restoring stock:", updateError);
-      }
-    }
-
-    // Refresh orders list
-    fetchCustomerOrders();
   }
 
   return (
@@ -119,7 +36,7 @@ export default function CustomerOrdersPage() {
       {loading && <p>Loading your orders...</p>}
 
       <div className="grid grid-cols-1 gap-6">
-        {orders.length === 0 ? (
+        {!loading && orders.length === 0 ? (
           <div className="text-gray-500">You have no orders yet</div>
         ) : (
           orders.map((order) => (
@@ -134,7 +51,7 @@ export default function CustomerOrdersPage() {
                     Order ID: {order.id}
                   </h1>
 
-                  {order.order_items.map((item: any, idx: number) => (
+                  {order.order_items.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3 mt-2">
                       {item.products?.image_url && (
                         <img
@@ -156,21 +73,21 @@ export default function CustomerOrdersPage() {
                 {/* Order details */}
                 <div className="flex justify-between h-full">
                   <div>
-                  <p className="text-sm mb-2">
-                    <strong>Address:</strong> {order.street}, {order.city}
-                  </p>
-                  <p className="text-sm mb-2">
-                    <strong>Payment:</strong> {order.payment_method}
-                  </p>
-                  <p className="text-sm">
-                    <strong>Status:</strong>{" "}
-                    <span className="capitalize">{order.status}</span>
-                  </p>
+                    <p className="text-sm mb-2">
+                      <strong>Address:</strong> {order.street}, {order.city}
+                    </p>
+                    <p className="text-sm mb-2">
+                      <strong>Payment:</strong> {order.payment_method}
+                    </p>
+                    <p className="text-sm">
+                      <strong>Status:</strong>{" "}
+                      <span className="capitalize">{order.status}</span>
+                    </p>
                   </div>
                   <div className="flex flex-col items-end justify-end w-[100%]">
                     {order.status === "pending" && (
                       <button
-                        onClick={() => cancelOrder(order)}
+                        onClick={() => handleCancel(order)}
                         className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
                       >
                         Cancel Order
