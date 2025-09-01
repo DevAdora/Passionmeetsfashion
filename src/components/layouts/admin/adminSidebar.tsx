@@ -35,7 +35,6 @@ export default function AdminSidebar() {
 
   return (
     <div>
-      {/* Mobile Trigger Button */}
       <div className="md:hidden p-4">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
@@ -52,7 +51,6 @@ export default function AdminSidebar() {
         </Sheet>
       </div>
 
-      {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 min-h-screen bg-white border-r">
         <SidebarContent pathname={pathname} />
       </aside>
@@ -71,12 +69,10 @@ function SidebarContent({
   return (
     <div className="flex flex-col h-full">
       {isMobile ? (
-        // Inside mobile Sheet → OK to use SheetHeader
         <SheetHeader className="p-4">
           <SheetTitle className="text-lg font-bold">Admin Panel</SheetTitle>
         </SheetHeader>
       ) : (
-        // Desktop header → plain div
         <div className="p-4">
           <h2 className="text-lg font-bold">Admin Panel</h2>
         </div>

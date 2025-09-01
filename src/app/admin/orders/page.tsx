@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import fetchOrders from "@/app/api/admin/fetchOrders";
-import confirmOrder from "@/app/api/admin/confirmOrder";
+import fetchOrders from "@/app/api/admin/fetchOrders/route";
+import confirmOrder from "@/app/api/admin/confirmOrder/route";
 import { Order } from "@/types/order";
 
 export default function AdminOrderPage() {
@@ -23,7 +23,7 @@ export default function AdminOrderPage() {
   async function handleConfirm(orderId: string) {
     const success = await confirmOrder(orderId);
     if (success) {
-      loadOrders(); // refresh orders after update
+      loadOrders(); 
     }
   }
 

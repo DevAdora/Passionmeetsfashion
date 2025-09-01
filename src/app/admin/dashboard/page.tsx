@@ -11,9 +11,9 @@ import {
 } from "recharts";
 
 import { useState, useEffect } from "react";
-import fetchOrderCounts from "@/app/api/admin/fetchOrderCounts";
-import fetchStockNumbers from "@/app/api/admin/fetchStockNumbers";
-import fetchOrderCategories from "@/app/api/admin/fetchOrderCategories";
+import fetchOrderCounts from "@/app/api/admin/fetchOrderCounts/route";
+import fetchStockNumbers from "@/app/api/admin/fetchStockNumbers/route";
+import fetchOrderCategories from "@/app/api/admin/fetchOrderCategories/route";
 
 export default function AdminDashboardPage() {
   const [counts, setCounts] = useState({
@@ -47,7 +47,6 @@ export default function AdminDashboardPage() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
-      {/* Order Status */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-gray-450 p-6 rounded-xl shadow-md text-black">
           <h1 className="font-bold text-[2rem]">Pending Orders</h1>
@@ -62,7 +61,6 @@ export default function AdminDashboardPage() {
           <h1 className="text-[2rem] font-bold">{counts.confirmed}</h1>
         </div>
       </div>
-      {/* Monthly Sales (static for now) */}
       <div className="bg-white p-6 rounded-xl shadow-md my-6">
         <h2 className="text-lg font-semibold mb-4">Monthly Sales</h2>
         <ResponsiveContainer width="100%" height={300}>
@@ -90,7 +88,6 @@ export default function AdminDashboardPage() {
         </ResponsiveContainer>
       </div>
 
-      {/* Stock Numbers */}
       <div className="bg-gray-450 p-6 rounded-xl shadow-md text-black mt-6">
         <h1 className="font-bold text-[2rem]">Stock Numbers</h1>
         {stockData.map((prod) => (
@@ -101,7 +98,6 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
-      {/* Order Categories */}
       <div className="bg-gray-450 p-6 rounded-xl shadow-md text-black mt-6">
         <h1 className="font-bold text-[2rem]">Order Categories</h1>
         {orderCategories.map((cat) => (
