@@ -36,8 +36,8 @@ export default function ProductCard({
   return (
     <>
       <Link href={`/user/details/${id}`}>
-        <div className="border border-black shadow hover:shadow-lg transition overflow-hidden">
-          <img src={image} alt={name} className="w-full h-60 object-contain" />
+        <div className="bg-gray-100 shadow hover:shadow-lg transition overflow-hidden">
+          <img src={image} alt={name} className="w-full h-100 object-contain" />
           <div className="p-4">
             <h3 className="text-lg font-semibold text-black">{name}</h3>
             <p className="text-gray-600">₱{price.toLocaleString()}</p>
