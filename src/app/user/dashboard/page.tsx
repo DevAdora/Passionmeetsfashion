@@ -4,6 +4,7 @@ import NewArrivals from "@/components/user/NewArrivals";
 import ProductGrid from "@/app/user/dashboard/ProductGrid";
 import CategoriesSection from "@/components/user/Categories";
 import Footer from "@/components/user/Footer";
+import Grid from "@/components/user/Grid";
 
 
 
@@ -20,6 +21,7 @@ export default function UserDashboardPage() {
       <Header />
       {/* Padding to avoid header overlap */}
       <Hero />
+      <Grid />
       <NewArrivals />
       <ProductGrid />
       <CategoriesSection />

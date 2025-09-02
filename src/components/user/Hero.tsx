@@ -23,18 +23,24 @@ export default function Hero() {
   return (
     <section className="relative min-h-screen w-full flex items-center">
       <div className="flex gap-2 p-5 w-full">
-        <div
-          ref={bigImageRef}
-          className="w-[70%] h-[100%] rounded-lg overflow-hidden flex justify-center items-center"
-        >
-          <Image
-            src="/assets/model6.png"
-            alt="Main model"
-            width={1000}
-            height={600}
-            className="h-full w-full object-contain"
-            priority
-          />
+        <div className="w-[70%] h-[100%] justify-center">
+          <div
+            ref={bigImageRef}
+            className="rounded-lg overflow-hidden flex justify-center items-center"
+          >
+            <Image
+              src="/assets/model6.png"
+              alt="Main model"
+              width={1000}
+              height={600}
+              className="h-full w-full object-contain"
+              priority
+            />
+          </div>
+          <div className="p-5 bottom-[17.5%] left-0 w-[55%] absolute leading-tight letter-spacing-[0.01rem]">
+            <h1 className="text-[6rem] font-bold">PASSION + FASHION</h1>
+            <p className="text-[1rem]">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur molestias, rerum, voluptates distinctio fugiat culpa vel error ipsum animi possimus nobis tempore eum eligendi suscipit est neque alias ratione explicabo.</p>
+          </div>
         </div>
 
         {/* Small image 1 */}
