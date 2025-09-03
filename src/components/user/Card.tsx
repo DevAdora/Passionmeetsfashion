@@ -3,6 +3,7 @@
 import { useState } from "react";
 import addToCart from "@/app/api/user/addToCart";
 import Link from "next/link";
+import { ShoppingCart } from "lucide-react";
 
 interface ProductCardProps {
   id: string;
@@ -11,7 +12,7 @@ interface ProductCardProps {
   price: number;
   description: string;
   colors: string[];
-  sizes: { label: string; stock: number }[]; 
+  sizes: { label: string; stock: number }[];
 }
 
 export default function ProductCard({
@@ -35,29 +36,41 @@ export default function ProductCard({
 
   return (
     <>
-      <Link href={`/user/details/${id}`}>
-        <div className="bg-gray-100 shadow hover:shadow-lg transition overflow-hidden">
-          <img src={image} alt={name} className="w-full h-100 object-contain" />
-          <div className="p-4">
-            <h3 className="text-lg font-semibold text-black">{name}</h3>
-            <p className="text-gray-600">₱{price.toLocaleString()}</p>
-            <div className="mt-4 flex gap-2">
-              <button
-                onClick={() => handleActionClick("cart")}
-                className="flex-1 px-4 py-2 border rounded text-black hover:bg-gray-100"
-              >
-                Add to Cart
-              </button>
-              <button
-                onClick={() => handleActionClick("buy")}
-                className="flex-1 px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-              >
-                Buy Now
-              </button>
-            </div>
+      <div className="transition overflow-hidden">
+        <Link href={`/user/details/${id}`}>
+          <div className="bg-gray-100 p-5">
+            <img
+              src={image}
+              alt={name}
+              className="w-full h-100 object-contain"
+            />
+          </div>
+        </Link>
+
+        <div>
+          <h3 className="text-lg font-semibold text-black">{name}</h3>
+          <p className="text-gray-600">₱{price.toLocaleString()}</p>
+
+          <div className="mt-4 flex items-center gap-3">
+            {/* Buy Now button */}
+            <button
+              onClick={() => handleActionClick("buy")}
+              className="w-1/2 px-4 py-2 bg-text text-black rounded border-black border hover:bg-black hover:text-white cursor-pointer tracking-white font-semibold uppercase"
+            >
+              Buy Now
+            </button>
+
+            {/* Add to Cart icon */}
+            <button
+              onClick={() => handleActionClick("cart")}
+              className="flex items-center justify-center w-12 h-12 rounded-full bg-black hover:bg-gray-800 cursor-pointer "
+              aria-label="Add to cart"
+            >
+              <ShoppingCart className="w-6 h-6 text-[#f0ede4]" />
+            </button>
           </div>
         </div>
-      </Link>
+      </div>
 
       {/* Modal */}
       {modalOpen && (
@@ -117,7 +130,6 @@ export default function ProductCard({
               </div>
             </div>
 
-        
             <button
               onClick={async () => {
                 if (actionType === "cart") {

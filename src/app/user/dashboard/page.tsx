@@ -6,14 +6,11 @@ import CategoriesSection from "@/components/user/Categories";
 import Footer from "@/components/user/Footer";
 import Grid from "@/components/user/Grid";
 
-
-
 // async function getCurrentUser() {
 //   const { data: { user }, error } = await supabase.auth.getUser();
 //   if (error) throw error;
-//   return user?.id; 
+//   return user?.id;
 // }
-
 
 export default function UserDashboardPage() {
   return (
@@ -25,6 +22,8 @@ export default function UserDashboardPage() {
       <NewArrivals />
       <ProductGrid />
       <CategoriesSection />
+      <Grid />
+
       <Footer />
     </main>
   );

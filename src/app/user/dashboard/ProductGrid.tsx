@@ -7,19 +7,15 @@ import fetchProducts from "@/app/api/user/fetchProducts";
 
 export default function ProductGrid() {
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
-  const [menProducts, setMenProducts] = useState<Product[]>([]);
-  const [womenProducts, setWomenProducts] = useState<Product[]>([]);
-  const [accessories, setAccessories] = useState<Product[]>([]);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
-      const { arrivals, men, women, accessories } = await fetchProducts();
+      const { arrivals } = await fetchProducts();
       setNewArrivals(arrivals);
-      setMenProducts(men);
-      setWomenProducts(women);
-      setAccessories(accessories);
+
       setLoading(false);
     };
     loadProducts();
@@ -50,25 +46,12 @@ export default function ProductGrid() {
 
   return (
     <div className="container mx-auto mt-8">
-      <h2 className="text-[4rem] font-bold mb-6 text-left text-black uppercase">
-        New Arrivals
-      </h2>
+      <div className="p-6 w-[17.5%]">
+        <h2 className="text-[1.2rem] font-semibold mb-6 text-left text-white uppercase bg-black  p-4">
+          New Arrivals
+        </h2>
+      </div>
       {renderGrid(newArrivals)}
-
-      <h2 className="text-[4rem] font-bold mb-6 text-left text-black uppercase">
-        Men Top Picks
-      </h2>
-      {renderGrid(menProducts)}
-
-      <h2 className="text-[4rem] font-bold mb-6 text-left text-black uppercase">
-        Women Top Picks
-      </h2>
-      {renderGrid(womenProducts)}
-
-      <h2 className="text-[4rem] font-bold mb-6 text-left text-black uppercase">
-        Accessories Top Picks
-      </h2>
-      {renderGrid(accessories)}
     </div>
   );
 }
