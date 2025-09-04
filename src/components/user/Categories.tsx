@@ -7,7 +7,7 @@ export default function CategoriesSection() {
   return (
     <section className="container w-full flex justify-start items-start py-12 px-6 mx-auto mt-8">
       <div className="relative w-1/2 h-screen group overflow-hidden cursor-pointer">
-        <Link href={`/user/product`}>
+        <Link href={`/user/product?category=Women`}>
           <Image
             src="/assets/model.png"
             alt="For Her"
@@ -46,7 +46,7 @@ export default function CategoriesSection() {
       </div>
 
       <div className="relative w-1/2 h-screen group overflow-hidden cursor-pointer">
-        <Link href={`/user/product`}>
+        <Link href={`/user/product?category=Men`}>
           <Image
             src="/assets/model1.png"
             alt="For Him"

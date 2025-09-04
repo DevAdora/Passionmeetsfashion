@@ -1,11 +1,18 @@
 export interface Product {
-  id: string;
+  id: number;
   name: string;
+  description: string | null;
   image_url: string;
   price: number;
-  description: string;
-  colors?: string[];
-  sizes?: { label: string; stock: number }[];
-  category?: string;
+  colors: string[] | null;
+  sizes:
+    | {
+        label: string;
+        stock: number;
+      }[]
+    | null;
+  category: string | null;
+  subcategory: string | null;
   created_at?: string;
+  
 }
