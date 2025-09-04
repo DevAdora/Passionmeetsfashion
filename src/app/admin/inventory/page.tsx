@@ -223,7 +223,7 @@ export default function AdminInventoryPage() {
                 </Button>
                 <Button
                   variant="destructive"
-                  onClick={() => deleteProduct(product.id)}
+                  onClick={() => deleteProduct(String(product.id))}
                 >
                   Delete
                 </Button>
