@@ -1,14 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import ProductCard from "@/components/user/Card";
 import fetchAllProducts from "@/app/api/user/fetchAllProduct";
 import { Product } from "@/types/product";
 import Header from "@/components/user/Header";
 
-export default function ProductPage() {
+function ProductContent() {
   const searchParams = useSearchParams();
-  const genderCategory = searchParams.get("category"); 
+  const genderCategory = searchParams.get("category");
 
   const [products, setProducts] = useState<Product[]>([]);
   const [subcategories, setSubcategories] = useState<
@@ -44,7 +44,7 @@ export default function ProductPage() {
         setSubcategories(uniqueSubcats);
 
         if (uniqueSubcats.length > 0) {
-          setSelectedCategory(uniqueSubcats[0].key); 
+          setSelectedCategory(uniqueSubcats[0].key);
         }
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -90,7 +90,6 @@ export default function ProductPage() {
           </ul>
         </div>
 
-        {/* Products */}
         <div className="w-[70%] bg-white">
           <div className="p-6">
             <h1 className="text-2xl font-bold mb-2 capitalize">
@@ -129,5 +128,12 @@ export default function ProductPage() {
         </div>
       </div>
     </section>
+  );
+}
+export default function ProductPage() {
+  return (
+    <Suspense fallback={<div>Loading product...</div>}>
+      <ProductContent />
+    </Suspense>
   );
 }
