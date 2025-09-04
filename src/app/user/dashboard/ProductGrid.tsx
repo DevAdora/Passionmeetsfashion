@@ -46,7 +46,7 @@ export default function ProductGrid() {
 
   return (
     <div className="container mx-auto mt-8">
-      <div className="p-6 w-[17.5%]">
+      <div className="p-6 text-center w-full  md:w-[25%] md:text-left">
         <h2 className="text-[1.2rem] font-semibold mb-6 text-left text-white uppercase bg-black  p-4">
           New Arrivals
         </h2>

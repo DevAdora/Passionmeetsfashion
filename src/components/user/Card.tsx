@@ -52,7 +52,6 @@ export default function ProductCard({
           <p className="text-gray-600">₱{price.toLocaleString()}</p>
 
           <div className="mt-4 flex items-center gap-3">
-            {/* Buy Now button */}
             <button
               onClick={() => handleActionClick("buy")}
               className="w-1/2 px-4 py-2 bg-text text-black rounded border-black border hover:bg-black hover:text-white cursor-pointer tracking-white font-semibold uppercase"
@@ -60,7 +59,6 @@ export default function ProductCard({
               Buy Now
             </button>
 
-            {/* Add to Cart icon */}
             <button
               onClick={() => handleActionClick("cart")}
               className="flex items-center justify-center w-12 h-12 rounded-full bg-black hover:bg-gray-800 cursor-pointer "
@@ -72,10 +70,9 @@ export default function ProductCard({
         </div>
       </div>
 
-      {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg max-w-lg w-full p-6 relative">
+          <div className="bg-white rounded-lg max-w-lg w-full p-6 relative m-6">
             <button
               onClick={() => setModalOpen(false)}
               className="absolute top-3 right-3 text-black hover:text-black"

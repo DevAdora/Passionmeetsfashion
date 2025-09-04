@@ -5,8 +5,8 @@ import Link from "next/link";
 
 export default function CategoriesSection() {
   return (
-    <section className="container w-full flex justify-start items-start py-12 px-6 mx-auto mt-8">
-      <div className="relative w-1/2 h-screen group overflow-hidden cursor-pointer">
+    <section className="container w-full flex justify-center items-start md:justify-start md:items-start md:py-12 md:px-6 md:mx-auto mt-8 mb-8">
+      <div className="relative w-full md:w-1/2 h-screen group overflow-hidden cursor-pointer">
         <Link href={`/user/product?category=Women`}>
           <Image
             src="/assets/model.png"
@@ -45,7 +45,7 @@ export default function CategoriesSection() {
         </Link>
       </div>
 
-      <div className="relative w-1/2 h-screen group overflow-hidden cursor-pointer">
+      <div className="relative w-full md:w-1/2 h-screen group overflow-hidden cursor-pointer">
         <Link href={`/user/product?category=Men`}>
           <Image
             src="/assets/model1.png"
