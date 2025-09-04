@@ -44,7 +44,7 @@ export default function ProductPage() {
         setSubcategories(uniqueSubcats);
 
         if (uniqueSubcats.length > 0) {
-          setSelectedCategory(uniqueSubcats[0].key); // default
+          setSelectedCategory(uniqueSubcats[0].key); 
         }
       } catch (error) {
         console.error("Error fetching products:", error);

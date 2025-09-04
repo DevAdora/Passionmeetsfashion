@@ -42,11 +42,11 @@ export default function RelatedProducts() {
         {products.map((product) => (
           <ProductCard
             key={product.id}
-            id={product.id}
+            id={String(product.id)}
             name={product.name}
             image={product.image_url}
             price={product.price}
-            description={product.description}
+            description={product.description ?? ""}
             colors={product.colors || []}
             sizes={product.sizes || []}
           />

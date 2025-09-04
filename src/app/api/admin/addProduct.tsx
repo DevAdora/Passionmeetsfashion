@@ -8,6 +8,7 @@ export default async function addProduct(product: {
   sizes: { label: string; stock: number }[];
   price: number;
   category: string;
+  subcategory: string;
   imageFile: File;
 }) {
   const imageUrl = await handleImageUpload(product.imageFile);
@@ -20,6 +21,7 @@ export default async function addProduct(product: {
       colors: product.colors,
       sizes: product.sizes,
       category: product.category,
+      subcategory: product.subcategory,
       price: product.price,
       image_url: imageUrl,
     },

@@ -6,9 +6,12 @@ import { Suspense, useMemo, useState, useEffect } from "react";
 import applyVoucher from "@/app/api/user/applyVoucher";
 import fetchUserProfile from "@/app/api/user/fetchUserProfile";
 import handlePlaceOrder from "@/app/api/user/handlePlaceOrder";
+import { toast } from "sonner";
 import type { CartItem } from "@/app/api/user/handlePlaceOrder";
+import { useRouter } from "next/navigation";
 
 function CheckoutContent() {
+  const route = useRouter();
   const [discount, setDiscount] = useState(0);
   const [voucher, setVoucher] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cod");
@@ -59,12 +62,15 @@ function CheckoutContent() {
   };
 
   const placeOrder = async () => {
+
     await handlePlaceOrder({
       address,
       paymentMethod,
       finalPrice,
       items,
     });
+
+    route.push("/user/order");
   };
 
   return (
@@ -161,7 +167,6 @@ function CheckoutContent() {
             </div>
           </div>
 
-          {/* Voucher */}
           <div className="bg-white shadow p-6 rounded-lg">
             <h2 className="text-xl font-bold mb-4 text-black">Voucher</h2>
             <div className="flex gap-2">
@@ -182,7 +187,6 @@ function CheckoutContent() {
           </div>
         </div>
 
-        {/* Order Summary */}
         <div className="bg-white shadow p-6 rounded-lg h-fit">
           <h2 className="text-xl font-bold mb-4 text-black">Order Summary</h2>
           <div className="space-y-4">

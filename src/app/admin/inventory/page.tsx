@@ -31,6 +31,7 @@ export default function AdminInventoryPage() {
   ]);
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
+  const [subcategory, setsubCategory] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export default function AdminInventoryPage() {
   }
 
   async function handleAddProduct() {
-    if (!imageFile || !name || !price || !category) {
+    if (!imageFile || !name || !price || !category || !subcategory) {
       alert("Please fill in all required fields");
       return;
     }
@@ -56,6 +57,7 @@ export default function AdminInventoryPage() {
       colors,
       sizes,
       category,
+      subcategory,
       price: parseFloat(price),
       imageFile,
     });
@@ -79,6 +81,7 @@ export default function AdminInventoryPage() {
       { label: "Large", stock: 0 },
     ]);
     setPrice("");
+    setsubCategory("");
     setCategory("");
     setImageFile(null);
   }
@@ -117,6 +120,11 @@ export default function AdminInventoryPage() {
                 placeholder="Category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
+              />
+              <Input
+                placeholder="Sub Category"
+                value={subcategory}
+                onChange={(e) => setsubCategory(e.target.value)}
               />
               <Input
                 placeholder="Colors (comma separated)"
@@ -172,7 +180,6 @@ export default function AdminInventoryPage() {
         </Dialog>
       </div>
 
-      {/* Products Grid */}
       {loading ? (
         <p>Loading...</p>
       ) : (

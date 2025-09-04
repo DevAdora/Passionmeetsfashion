@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 export interface CartItem {
   id: string;
@@ -38,7 +39,6 @@ export default async function handlePlaceOrder({
       return;
     }
 
-    // Insert order
     const { data: orderData, error: orderError } = await supabase
       .from("orders")
       .insert([
@@ -57,17 +57,16 @@ export default async function handlePlaceOrder({
       .select();
 
     if (orderError || !orderData || orderData.length === 0) {
-      console.error("Order insert error:", orderError);
+      toast.error("Order insert error");
       alert("Failed to place order");
       return;
     }
 
     const order = orderData[0];
 
-    // Insert items
     const orderItems = items.map((item) => ({
       order_id: order.id,
-      product_id: item.product_id, // keep as string
+      product_id: item.product_id,
       product_name: item.product_name,
       price: item.price,
       quantity: item.quantity,
@@ -80,12 +79,11 @@ export default async function handlePlaceOrder({
       .insert(orderItems);
 
     if (itemsError) {
-      console.error("Order items insert error:", itemsError);
+      toast.error("Order items insert error");
       alert("Failed to save order items");
       return;
     }
 
-    // Update stock
     for (const item of items) {
       const { data: product, error: fetchError } = await supabase
         .from("products")
@@ -94,7 +92,7 @@ export default async function handlePlaceOrder({
         .single();
 
       if (fetchError || !product) {
-        console.error("Error fetching product sizes:", fetchError);
+        toast.error("Error fetching product sizes");
         continue;
       }
 
@@ -118,11 +116,10 @@ export default async function handlePlaceOrder({
         .eq("id", item.product_id);
 
       if (updateError) {
-        console.error("Error updating stock:", updateError);
+        toast.error("Error updating stock" );
       }
     }
 
-    // Clear cart
     const { error: clearCartError } = await supabase
       .from("cart_items")
       .delete()
@@ -136,9 +133,8 @@ export default async function handlePlaceOrder({
       console.error("Error clearing cart:", clearCartError);
     }
 
-    alert("Order placed successfully!");
+    toast.success("Order placed successfully!");
   } catch (err) {
-    console.error("Unexpected error:", err);
-    alert("Something went wrong");
+    toast.error("Something went wrong");
   }
 }

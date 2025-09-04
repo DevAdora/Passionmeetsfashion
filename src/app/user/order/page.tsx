@@ -29,7 +29,7 @@ export default function CustomerOrdersPage() {
   }
 
   return (
-    <section className="p-6 min-h-screen w-full">
+    <section className="p-6 min-h-screen w-full mx-auto container">
       <Header />
       <h1 className="text-2xl font-bold mb-6">My Orders</h1>
 
@@ -45,7 +45,6 @@ export default function CustomerOrdersPage() {
               className="bg-white p-6 rounded-xl shadow-md text-black"
             >
               <div className="grid grid-cols-2 gap-4">
-                {/* Order items */}
                 <div>
                   <h1 className="font-semibold text-[1rem] mb-2">
                     Order ID: {order.id}
@@ -70,7 +69,6 @@ export default function CustomerOrdersPage() {
                   ))}
                 </div>
 
-                {/* Order details */}
                 <div className="flex justify-between h-full">
                   <div>
                     <p className="text-sm mb-2">
