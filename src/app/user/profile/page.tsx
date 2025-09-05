@@ -63,6 +63,7 @@ export default function UserProfilePage() {
             <div key={field} className="flex items-center gap-3">
               <input
                 type="text"
+                placeholder={"Enter " + field}
                 value={profile[field] || ""}
                 readOnly={editingField !== field}
                 onChange={(e) =>
@@ -87,7 +88,6 @@ export default function UserProfilePage() {
             </div>
           ))}
 
-          {/* Password */}
           <div className="flex items-center gap-3">
             <input
               type="password"

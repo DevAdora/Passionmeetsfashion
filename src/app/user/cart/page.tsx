@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-
 type CartItem = {
   id: number;
   product_id: string;
@@ -69,7 +68,6 @@ export default function CartPage() {
       return;
     }
 
-    // Pass data to checkout page (you can use state, context, or query params)
     router.push(
       `/user/checkout?items=${encodeURIComponent(
         JSON.stringify(selectedProducts)
@@ -95,11 +93,11 @@ export default function CartPage() {
     .reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto p-10 min-h-screen w-full ">
       <Header />
 
-      <h1 className="text-3xl font-bold text-black mb-6">Your Cart</h1>
-      <div className="space-y-4">
+      <h1 className="text-2xl font-semibold mb-6">Your Cart</h1>
+      <div className="space-y-4 ">
         {cartItems.map((item) => (
           <div
             key={item.id}
@@ -116,8 +114,9 @@ export default function CartPage() {
               alt={item.product_name}
               className="w-20 h-20 object-contain border rounded"
             />
+
             <div className="flex-1">
-              <h2 className="text-lg font-semibold text-black">
+              <h2 className="text-[0.7rem] md:text-[1rem] font-semibold text-black">
                 {item.product_name}
               </h2>
               <p className="text-gray-600">
@@ -136,7 +135,7 @@ export default function CartPage() {
                 </div>
               )}
             </div>
-            <div className="text-lg font-bold text-black">
+            <div className="text-lg font-semibold text-black">
               ₱{(item.price * item.quantity).toLocaleString()}
             </div>
           </div>
@@ -144,7 +143,7 @@ export default function CartPage() {
       </div>
 
       <div className="mt-6 flex justify-between items-center">
-        <p className="text-xl font-bold text-black">
+        <p className="text-xl font-semibold text-black">
           Total: ₱{totalPrice.toLocaleString()}
         </p>
         <button

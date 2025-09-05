@@ -24,7 +24,7 @@ export default function CustomerOrdersPage() {
   async function handleCancel(order: Order) {
     const success = await cancelOrder(order);
     if (success) {
-      await loadOrders(); // refresh orders after cancellation
+      await loadOrders();
     }
   }
 
@@ -44,9 +44,9 @@ export default function CustomerOrdersPage() {
               key={order.id}
               className="bg-white p-6 rounded-xl shadow-md text-black"
             >
-              <div className="grid grid-cols-2 gap-4">
+              <div className="md:grid md:grid-cols-2 gap-4">
                 <div>
-                  <h1 className="font-semibold text-[1rem] mb-2">
+                  <h1 className="font-semibold text-[0.7rem] md:text-[1rem] mb-2">
                     Order ID: {order.id}
                   </h1>
 
@@ -69,7 +69,7 @@ export default function CustomerOrdersPage() {
                   ))}
                 </div>
 
-                <div className="flex justify-between h-full">
+                <div className="flex justify-between h-full mt-4">
                   <div>
                     <p className="text-sm mb-2">
                       <strong>Address:</strong> {order.street}, {order.city}
