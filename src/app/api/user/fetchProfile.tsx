@@ -22,6 +22,5 @@ export default async function fetchProfile() {
     return null;
   }
 
-  // Return merged profile + email
   return { ...profileData, email: user.email };
 }

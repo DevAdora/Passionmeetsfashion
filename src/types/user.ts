@@ -7,4 +7,5 @@ export interface Profile {
   city?: string;
   postal?: string;
   password?: string; 
+  role: string;
 }

@@ -54,7 +54,7 @@ export default function ProductCard({
           <div className="mt-4 flex items-center gap-3">
             <button
               onClick={() => handleActionClick("buy")}
-              className="w-1/2 px-4 py-2 bg-text text-black rounded border-black border hover:bg-black hover:text-white cursor-pointer tracking-white font-semibold uppercase"
+              className="w-[70%] px-4 py-2 bg-text text-black rounded border-black border hover:bg-black hover:text-white cursor-pointer tracking-white font-semibold uppercase"
             >
               Buy Now
             </button>

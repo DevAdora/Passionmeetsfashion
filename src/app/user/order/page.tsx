@@ -5,6 +5,7 @@ import Header from "@/components/user/Header";
 import fetchCustomerOrders from "@/app/api/user/fetchCustomerOrders";
 import cancelOrder from "@/app/api/user/cancelOrder";
 import { Order } from "@/types/order";
+import { FaLocationArrow } from "react-icons/fa";
 
 export default function CustomerOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -44,56 +45,96 @@ export default function CustomerOrdersPage() {
               key={order.id}
               className="bg-white p-6 rounded-xl shadow-md text-black"
             >
-              <div className="md:grid md:grid-cols-2 gap-4">
-                <div>
-                  <h1 className="font-semibold text-[0.7rem] md:text-[1rem] mb-2">
-                    Order ID: {order.id}
-                  </h1>
-
-                  {order.order_items.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3 mt-2">
-                      {item.products?.image_url && (
-                        <img
-                          src={item.products.image_url}
-                          alt={item.products.name}
-                          className="w-16 h-16 rounded-md object-cover"
-                        />
-                      )}
-                      <div>
-                        <h2 className="font-semibold">{item.products?.name}</h2>
-                        <p className="text-sm text-gray-700">
-                          Qty: {item.quantity} × ₱{item.products?.price}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex justify-between h-full mt-4">
-                  <div>
-                    <p className="text-sm mb-2">
-                      <strong>Address:</strong> {order.street}, {order.city}
-                    </p>
-                    <p className="text-sm mb-2">
-                      <strong>Payment:</strong> {order.payment_method}
-                    </p>
-                    <p className="text-sm">
-                      <strong>Status:</strong>{" "}
-                      <span className="capitalize">{order.status}</span>
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end justify-end w-[100%]">
-                    {order.status === "pending" && (
-                      <button
-                        onClick={() => handleCancel(order)}
-                        className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-                      >
-                        Cancel Order
-                      </button>
-                    )}
-                  </div>
+              {/* Header row */}
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="font-semibold text-sm md:text-base">
+                  Order ID <span className="font-bold">#{order.id}</span>
+                </h2>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">
+                    Estimated arrival: {"N/A"}
+                  </span>
+                  <span
+                    className={`px-3 py-1 text-xs rounded-full ${
+                      order.status === "confirmed"
+                        ? "bg-green-100 text-green-600"
+                        : order.status === "shipped"
+                        ? "bg-green-100 text-green-600"
+                        : "bg-yellow-100 text-yellow-600"
+                    }`}
+                  >
+                    {order.status}
+                  </span>
                 </div>
               </div>
+
+              <div className="flex items-center text-sm text-gray-600 mb-4">
+                <span className="mx-2">───────── </span>
+                <FaLocationArrow className="rotate-[45deg] mx-2" />
+                <span>
+                  {order.street}, {order.city}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                {order.order_items.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-3 border rounded-lg p-3"
+                  >
+                    {item.products?.image_url && (
+                      <img
+                        src={item.products.image_url}
+                        alt={item.products?.name}
+                        className="w-16 h-16 object-cover rounded-md"
+                      />
+                    )}
+                    <div className="flex flex-col">
+                      <h3 className="font-semibold text-sm">
+                        {item.products?.name}
+                      </h3>
+                      <p className="text-sm text-gray-700">
+                        ₱ {item.products?.price} × {item.quantity}
+                      </p>
+                      {item.size && (
+                        <p className="text-xs text-gray-500">
+                          Size: {item.size}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer */}
+              <div className="flex justify-between items-center">
+                <p className="font-semibold">
+                  ₱{" "}
+                  {order.order_items
+                    .reduce(
+                      (sum, item) =>
+                        sum + (item.products?.price || 0) * item.quantity,
+                      0
+                    )
+                    .toLocaleString("id-ID")}{" "}
+                  <span className="text-gray-500 text-sm">
+                    ({order.order_items.length} Items)
+                  </span>
+                </p>
+                {order.status === "pending" && (
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={() => handleCancel(order)}
+                      className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                    >
+                      Cancel Order
+                    </button>
+                  </div>
+                )}
+              </div>
+              {/* <button className="bg-black text-white px-4 py-2 rounded-lg text-sm">
+                  Details
+                </button> */}
             </div>
           ))
         )}
