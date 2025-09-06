@@ -67,7 +67,7 @@ function SidebarContent({
   isMobile?: boolean;
 }) {
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full fixed">
       {isMobile ? (
         <SheetHeader className="p-4">
           <SheetTitle className="text-lg font-bold">Admin Panel</SheetTitle>

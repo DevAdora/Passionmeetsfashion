@@ -106,7 +106,6 @@ export default function CustomerOrdersPage() {
                 ))}
               </div>
 
-              {/* Footer */}
               <div className="flex justify-between items-center">
                 <p className="font-semibold">
                   ₱{" "}
