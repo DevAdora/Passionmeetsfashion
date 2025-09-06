@@ -60,7 +60,7 @@ export default function AdminOrderPage() {
                           <div>
                             <h2 className="font-semibold">{item.products.name}</h2>
                             <p className="text-sm text-gray-700">
-                              Qty: {item.quantity} × ${item.products.price}
+                              Qty: {item.quantity} × ₱{item.products.price}
                             </p>
                           </div>
                         </>

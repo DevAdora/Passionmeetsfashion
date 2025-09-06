@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Header from "@/components/user/Header";
 import { useRouter } from "next/navigation";
+import deleteCartItem from "@/app/api/user/deleteCartItem";
+import updateCartItem from "@/app/api/user/updateCartItem";
+import { FaTrash } from "react-icons/fa";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +25,7 @@ export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingItem, setEditingItem] = useState<CartItem | null>(null); // for modal
   const router = useRouter();
 
   useEffect(() => {
@@ -41,7 +45,13 @@ export default function CartPage() {
           .eq("user_id", user.id);
 
         if (error) throw error;
-        setCartItems(data || []);
+
+        const normalized = (data || []).map((item) => ({
+          ...item,
+          price: Number(item.price) || 0,
+        }));
+
+        setCartItems(normalized);
       } catch (err) {
         console.error("Error fetching cart:", err);
       } finally {
@@ -56,6 +66,35 @@ export default function CartPage() {
     setSelectedItems((prev) =>
       prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
     );
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteCartItem(id.toString());
+      setCartItems((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      console.error("Failed to delete item:", err);
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!editingItem) return;
+    try {
+      await updateCartItem({
+        cartItemId: editingItem.id.toString(),
+        size: editingItem.size,
+        color: editingItem.color,
+        quantity: editingItem.quantity,
+        image: editingItem.product_image,
+        price: editingItem.price,
+      });
+      setCartItems((prev) =>
+        prev.map((item) => (item.id === editingItem.id ? editingItem : item))
+      );
+      setEditingItem(null);
+    } catch (err) {
+      console.error("Failed to update item:", err);
+    }
   };
 
   const handleCheckout = () => {
@@ -115,7 +154,10 @@ export default function CartPage() {
               className="w-20 h-20 object-contain border rounded"
             />
 
-            <div className="flex-1">
+            <div
+              className="flex-1 cursor-pointer"
+              onClick={() => setEditingItem(item)} // click to edit
+            >
               <h2 className="text-[0.7rem] md:text-[1rem] font-semibold text-black">
                 {item.product_name}
               </h2>
@@ -135,8 +177,17 @@ export default function CartPage() {
                 </div>
               )}
             </div>
-            <div className="text-lg font-semibold text-black">
-              ₱{(item.price * item.quantity).toLocaleString()}
+
+            <div className="flex flex-col items-end gap-2">
+              <button
+                onClick={() => handleDelete(item.id)}
+                className="px-3 py-1 text-red-600 rounded hover:bg-red-600 hover:text-white cursor-pointer text-sm"
+              >
+                <FaTrash />
+              </button>
+              <div className="text-lg font-semibold text-black">
+                ₱{(item.price * item.quantity).toLocaleString()}
+              </div>
             </div>
           </div>
         ))}
@@ -154,6 +205,79 @@ export default function CartPage() {
           Checkout
         </button>
       </div>
+
+      {editingItem && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full relative">
+            <button
+              onClick={() => setEditingItem(null)}
+              className="absolute top-3 right-3 text-black"
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold mb-4 text-black">Edit Item</h2>
+            <img
+              src={editingItem.product_image}
+              className="w-full h-20 object-contain rounded-lg mb-4"
+            />
+            <p className="text-black font-semibold mb-4">
+              ₱{editingItem.price.toLocaleString()}
+            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-black">
+                Quantity
+              </label>
+              <input
+                type="number"
+                min={1}
+                value={editingItem.quantity}
+                onChange={(e) =>
+                  setEditingItem({
+                    ...editingItem,
+                    quantity: Number(e.target.value),
+                  })
+                }
+                className="mt-1 w-full border rounded p-2 text-black"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-black">
+                Size
+              </label>
+              <input
+                type="text"
+                value={editingItem.size || ""}
+                onChange={(e) =>
+                  setEditingItem({ ...editingItem, size: e.target.value })
+                }
+                className="mt-1 w-full border rounded p-2 text-black"
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-black">
+                Color
+              </label>
+              <input
+                type="text"
+                value={editingItem.color || ""}
+                onChange={(e) =>
+                  setEditingItem({ ...editingItem, color: e.target.value })
+                }
+                className="mt-1 w-full border rounded p-2 text-black"
+              />
+            </div>
+
+            <button
+              onClick={handleUpdate}
+              className="w-full py-2 bg-black text-white rounded hover:bg-gray-800"
+            >
+              Update Item
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

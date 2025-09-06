@@ -72,7 +72,7 @@ export default function Footer() {
             </li>
             <li>
               <a
-                href="https://www.instagram.com/soullessr4i/"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-black after:transition-all after:duration-300 hover:after:w-full"
@@ -82,7 +82,7 @@ export default function Footer() {
             </li>
             <li>
               <a
-                href="https://bento.me/devadora"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-black after:transition-all after:duration-300 hover:after:w-full"
@@ -92,7 +92,7 @@ export default function Footer() {
             </li>
             <li>
               <a
-                href="https://github.com/DevAdora"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative inline-block after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-black after:transition-all after:duration-300 hover:after:w-full"
@@ -138,7 +138,7 @@ export default function Footer() {
 
       <div className="flex flex-row sm:flex-row md:flex-row justify-between items-center mt-8 relative">
         <div className="text-xl md:text-2xl xl:text-[3rem] font-bold w-[40%] flex-wrap">
-          © 2025 DevAdora <br className="md:hidden" />
+          © Passion + Fashion <br className="md:hidden" />
           <span className="font-semibold block md:inline">
             All rights reserved.
           </span>
