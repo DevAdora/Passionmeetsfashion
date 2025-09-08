@@ -13,6 +13,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  
   Legend,
 } from "recharts";
 
@@ -75,23 +76,25 @@ export default function SalesPage() {
 
       <div className="bg-white p-6 rounded-xl shadow-md">
         <h2 className="text-lg font-semibold mb-4">Sales by Product</h2>
-        <PieChart>
-          <Pie
-            data={productSales}
-            dataKey="total"
-            nameKey="product"
-            cx="50%"
-            cy="50%"
-            outerRadius={120}
-            label
-          >
-            {productSales.map((_, index) => (
-              <Cell key={index} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
+        <ResponsiveContainer width="100%" height={400}>
+          <PieChart>
+            <Pie
+              data={productSales}
+              dataKey="total"
+              nameKey="product"
+              cx="50%"
+              cy="50%"
+              outerRadius={120}
+              label
+            >
+              {productSales.map((_, index) => (
+                <Cell key={index} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
     </section>
   );
