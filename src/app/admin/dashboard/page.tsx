@@ -134,7 +134,7 @@ export default function AdminDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 w-full">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -166,7 +166,6 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border p-6">
           <div className="flex items-center justify-between">

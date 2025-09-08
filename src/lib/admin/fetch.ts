@@ -1,5 +1,6 @@
 import { supabaseServer } from "@/lib/server";
 import { Order } from "@/types/order";
+import { Profile } from "@/types/user";
 import { Product } from "@/types/product";
 
 export async function fetchOrders(): Promise<Order[]> {
@@ -184,7 +185,7 @@ export async function fetchProductSales() {
       )
     `
     )
-    .eq("orders.status", "shipped"); 
+    .eq("orders.status", "shipped");
 
   if (error) {
     console.error("Error fetching product sales:", error);
@@ -209,5 +210,45 @@ export async function fetchProductSales() {
   return Object.entries(productTotals).map(([product, total]) => ({
     product,
     total,
+  }));
+}
+
+type ProfileRow = {
+  id: string;
+  username: string;
+  role: string;
+  created_at: string;
+  street?: string | null;
+  city?: string | null;
+  province?: string | null;
+  postal?: string | null;
+  phone?: string | null;
+};
+
+
+export async function fetchUsers(): Promise<Profile[]> {
+  const { data, error } = await supabaseServer
+    .from("profiles")
+    .select(
+      "id, username, role, created_at, street, city, province, postal, phone"
+    )
+    .eq("role", "user")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
+
+  return (data ?? []).map((u: ProfileRow) => ({
+    id: u.id,
+    role: u.role,
+    created_at: u.created_at,
+    fullName: u.username, 
+    street: u.street ?? undefined,
+    city: u.city ?? undefined,
+    province: u.province ?? undefined,
+    postal: u.postal ?? undefined,
+    phone: u.phone ?? undefined,
   }));
 }

@@ -49,11 +49,11 @@ export default function AdminOrderPage() {
               className="bg-white p-6 rounded-xl shadow-md text-black"
             >
               {/* Header row */}
-              <div className="flex justify-between items-center mb-4">
+              <div className="md:flex justify-between items-center mb-4">
                 <h2 className="font-semibold text-sm md:text-base">
                   Order ID <span className="font-bold">#{order.id}</span>
                 </h2>
-                <div className="flex items-center gap-2">
+                <div className="flex md:grid md:grid-cols-2 items-center gap-4 pt-3">
                   <span className="text-xs text-gray-500">
                     Customer: {order.full_name}
                   </span>
@@ -72,14 +72,14 @@ export default function AdminOrderPage() {
               </div>
 
               <div className="flex items-center text-sm text-gray-600 mb-4">
-                <span className="mx-2">───────── </span>
+                <span className="">───────── </span>
                 <FaLocationArrow className="rotate-[45deg] mx-2" />
                 <span>
                   {order.street}, {order.city}
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
                 {order.order_items.map((item, idx) => (
                   <div
                     key={idx}

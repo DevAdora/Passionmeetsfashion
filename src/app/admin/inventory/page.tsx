@@ -93,18 +93,22 @@ export default function AdminInventoryPage() {
 
   return (
     <section className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Inventory</h1>
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <h1 className="text-3xl font-bold tracking-tight">Inventory</h1>
 
         <Dialog>
           <DialogTrigger asChild>
-            <Button>Add Item</Button>
+            <Button className="px-6">+ Add Product</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>Add New Product</DialogTitle>
+              <DialogTitle className="text-xl font-semibold">
+                Add New Product
+              </DialogTitle>
             </DialogHeader>
 
+            {/* Product Form */}
             <div className="space-y-4">
               <Input
                 placeholder="Product Name"
@@ -133,6 +137,7 @@ export default function AdminInventoryPage() {
                   setColors(e.target.value.split(",").map((c) => c.trim()))
                 }
               />
+              {/* Sizes */}
               <div className="space-y-2">
                 {sizes.map((size, index) => (
                   <div key={index} className="flex gap-2">
@@ -174,66 +179,87 @@ export default function AdminInventoryPage() {
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
-              <Button onClick={handleAddProduct}>Save</Button>
+              <Button onClick={handleAddProduct} className="w-full">
+                Save Product
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
+      {/* Product List */}
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-gray-500">Loading...</p>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
             <div
               key={product.id}
-              className="bg-white shadow-md rounded-lg p-4 flex justify-between"
+              className="bg-white rounded-xl shadow-sm border hover:shadow-md transition p-4 flex flex-col"
             >
-              <div className="flex w-[40%]">
+              {/* Product Image */}
+              <div className="w-full h-48 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
                 <img
                   src={product.image_url}
                   alt={product.name}
-                  className="h-48 w-[40%] object-contain rounded"
+                  className="h-full object-contain"
                 />
-                <div className="ml-4 flex-1">
-                  <h2 className="text-lg font-semibold mt-2">{product.name}</h2>
-                  <p className="text-sm text-gray-600">{product.description}</p>
-                  <p className="text-xs text-gray-500">
-                    Category: {product.category}
-                  </p>
-                  <div className="mt-2 gap-2 flex flex-wrap">
-                    {product.colors?.map((color: string, idx: number) => (
-                      <Badge key={idx} variant="secondary">
-                        {color}
+              </div>
+
+              {/* Product Details */}
+              <div className="flex-1 mt-4">
+                <h2 className="text-lg font-semibold truncate">
+                  {product.name}
+                </h2>
+                <p className="text-sm text-gray-600 line-clamp-2">
+                  {product.description}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Category: {product.category}
+                </p>
+
+                {/* Colors */}
+                <div className="mt-3 gap-2 flex flex-wrap">
+                  {product.colors?.map((color: string, idx: number) => (
+                    <Badge key={idx} variant="secondary">
+                      {color}
+                    </Badge>
+                  ))}
+                </div>
+
+                {/* Sizes */}
+                <div className="mt-3 gap-2 flex flex-wrap">
+                  {product.sizes?.map(
+                    (sizeObj: { label: string; stock: number }, idx: number) => (
+                      <Badge key={idx}>
+                        {sizeObj.label} ({sizeObj.stock})
                       </Badge>
-                    ))}
-                  </div>
+                    )
+                  )}
                 </div>
               </div>
-              <div className="mt-2 gap-2 flex flex-wrap">
-                {product.sizes?.map(
-                  (sizeObj: { label: string; stock: number }, idx: number) => (
-                    <Badge key={idx}>
-                      {sizeObj.label} ({sizeObj.stock})
-                    </Badge>
-                  )
-                )}
-              </div>
-              <p className="mt-2 font-bold">${product.price}</p>
 
-              <div className="flex gap-2 mt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => alert("Edit coming soon")}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => deleteProduct(String(product.id))}
-                >
-                  Delete
-                </Button>
+              {/* Price & Actions */}
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-lg font-bold text-gray-800">
+                  ₱{product.price}
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => alert("Edit coming soon")}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => deleteProduct(String(product.id))}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

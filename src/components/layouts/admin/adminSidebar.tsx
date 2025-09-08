@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { usePathname } from "next/navigation";
 import {
   Sheet,
@@ -19,6 +20,7 @@ import {
   BarChart,
   Menu,
   LogOut,
+  User,
 } from "lucide-react";
 
 const navItems = [
@@ -26,7 +28,8 @@ const navItems = [
   { name: "Orders", path: "/admin/orders", icon: ShoppingCart },
   { name: "Inventory", path: "/admin/inventory", icon: Package },
   { name: "Sales", path: "/admin/sales", icon: BarChart },
-  { name: "Logout", path: "/auth/login", icon:  LogOut},
+  { name: "Accounts", path: "/admin/user", icon: User },
+  { name: "Logout", path: "/auth/login", icon: LogOut },
 ];
 
 export default function AdminSidebar() {
@@ -35,23 +38,30 @@ export default function AdminSidebar() {
 
   return (
     <div>
-      <div className="md:hidden p-4">
+      <div className="fixed md:hidden p-4">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="p-0">
+          <SheetContent side="left" className="p-0 w-full sm:max-w-sm">
+            <SheetHeader>
+              <VisuallyHidden>
+                <SheetTitle>Admin Panel</SheetTitle>
+              </VisuallyHidden>
+            </SheetHeader>
+
             <SidebarContent
               pathname={pathname}
               onClickLink={() => setOpen(false)}
+              isMobile
             />
           </SheetContent>
         </Sheet>
       </div>
 
-      <aside className="hidden md:flex flex-col w-64 min-h-screen bg-white border-r">
+      <aside className="hidden md:flex flex-col md:w-64 min-h-screen bg-white border-r">
         <SidebarContent pathname={pathname} />
       </aside>
     </div>
@@ -67,7 +77,7 @@ function SidebarContent({
   isMobile?: boolean;
 }) {
   return (
-    <div className="flex flex-col h-full fixed">
+    <div className="flex flex-col h-full fixed w-64">
       {isMobile ? (
         <SheetHeader className="p-4">
           <SheetTitle className="text-lg font-bold">Admin Panel</SheetTitle>
@@ -80,7 +90,7 @@ function SidebarContent({
 
       <Separator />
 
-      <nav className="flex flex-col flex-1 p-4 space-y-2">
+      <nav className="flex flex-col flex-1 p-4 space-y-2 ">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.path);
