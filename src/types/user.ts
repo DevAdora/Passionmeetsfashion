@@ -13,7 +13,9 @@
 
 export interface Profile {
   id: string;
-  fullName: string;   // maps from "username"
+  fullName: string;   
+  email?: string;
+  password?: string;
   role: string;
   created_at: string;
   street?: string;
